@@ -13,7 +13,7 @@ import qualified Data.ByteString.Lazy as B
 import Control.Applicative ((<|>))
 
 import GHC.Generics
-import Data.Aeson
+import Data.Aeson hiding (Error)
 import Data.Aeson.Types (Parser)
 import Data.Aeson.Casing (aesonPrefix, camelCase)
 
@@ -79,9 +79,23 @@ instance FromJSON CompilerOutput where
    parseJSON = genericParseJSON jsonOptions
 
 
+simplePrinter :: CompilerOutput -> T.Text
+simplePrinter (CompilerOutput errors errorType) =
+  case errors of
+    [] -> ""
+    xs -> T.intercalate "\n" (printError <$> xs)
+
+printError :: Error -> T.Text
+printError (Error filePath errorName problems) =
+  T.concat $ fmap (\p -> errorName <> ":" <> filePath <> ":" <> printProblem p) problems
+
+
+printProblem :: Problem -> T.Text
+printProblem (Problem _ (Region (LineAndColumn start end) _) _) = (T.pack . show $ start) <> ":" <> (T.pack . show $ end)
+
 someFunc :: IO ()
 someFunc =
-  let result = eitherDecode sample1 :: Either String CompilerOutput
-  in T.putStrLn . T.pack . show $ result
+  let resultE = eitherDecode sample1 :: Either String CompilerOutput
+  in T.putStrLn $ either (("Parsing error: " <>) . T.pack) simplePrinter resultE
 
 
