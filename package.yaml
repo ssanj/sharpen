@@ -29,6 +29,7 @@ library:
   - bytestring
   - aeson
   - aeson-casing
+  - deepseq
 
 executables:
   voelm-exe:
