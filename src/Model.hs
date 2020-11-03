@@ -136,4 +136,4 @@ data Config =
   }
 
 defaultConfig :: Config
-defaultConfig = Config AllErrors Full
+defaultConfig = Config OneError Full

@@ -40,6 +40,12 @@ simpleErrorDescriptionInterpretter config (CompilerErrorDescription errorDescrip
   do
     traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested (numErrors config) errorDescriptions)
     newLines 2
+    printNumberOfCompilationErrors (N.length errorDescriptions)
+    newLines 2
+
+printNumberOfCompilationErrors :: Int -> IO ()
+printNumberOfCompilationErrors errors =
+  T.putStr "Compilation errors: " >> withColourInline (showt errors) Red
 
 filterByRequested :: NumberOfErrors -> N.NonEmpty ProblemsAtFileLocation -> [ProblemsAtFileLocation]
 filterByRequested AllErrors = N.toList . id
@@ -59,7 +65,7 @@ createTitleAndFile :: ProblemsAtFileLocation -> IO ()
 createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
   let coords = (showt s) <> ":" <> (showt e)
       singleFileMessage = "-- " <> title <> " ---------- " <> filePath <> ":" <> coords
-  in withColour singleFileMessage Cyan
+  in withColourInline singleFileMessage Cyan >> newLines 1
 
 renderProblem :: ProblemDescription -> IO ()
 renderProblem (ProblemDescription formatting message) =
@@ -121,8 +127,8 @@ maybeColor text =
 boolToMaybe :: Bool -> a -> Maybe a
 boolToMaybe predicate value = if predicate then Just value else Nothing
 
-withColour :: T.Text -> Color -> IO ()
-withColour text color = do
+withColourInline :: T.Text -> Color -> IO ()
+withColourInline text color = do
   setSGR [(SetColor Foreground Dull color)]
-  T.putStrLn text
+  T.putStr text
   resetAnsi
