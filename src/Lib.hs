@@ -27,17 +27,23 @@ import qualified Data.List.NonEmpty   as N
 
 import Data.List.NonEmpty (NonEmpty(..), (<|))
 
+type Printer = Config -> CompilerOutput -> IO ()
 
-simplePrinter :: CompilerOutput -> IO ()
-simplePrinter (CompilerOutput nonEmptyErrors errorType) =
+
+simplePrinter :: Printer
+simplePrinter config (CompilerOutput nonEmptyErrors errorType) =
   let desc = processErrors <$> nonEmptyErrors
-  in simpleErrorDescriptionInterpretter $ CompilerErrorDescription $ desc >>= id
+  in simpleErrorDescriptionInterpretter config $ CompilerErrorDescription $ desc >>= id
 
-simpleErrorDescriptionInterpretter :: CompilerErrorDescription -> IO ()
-simpleErrorDescriptionInterpretter (CompilerErrorDescription errorDescriptions) =
+simpleErrorDescriptionInterpretter :: Config -> CompilerErrorDescription -> IO ()
+simpleErrorDescriptionInterpretter config (CompilerErrorDescription errorDescriptions) =
   do
-    traverse_ (\ed -> newLines 2 >> renderFileProblems ed) errorDescriptions
+    traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested (numErrors config) errorDescriptions)
     newLines 2
+
+filterByRequested :: NumberOfErrors -> N.NonEmpty ProblemsAtFileLocation -> [ProblemsAtFileLocation]
+filterByRequested AllErrors = N.toList . id
+filterByRequested OneError  = N.take 1
 
 newLines :: Int -> IO ()
 newLines n = traverse_ (const $ T.putStrLn "") [1..n]
@@ -84,13 +90,13 @@ problemDescription (MessageFormatting (MessageFormat {messageformatBold = doBold
         catMaybes $ [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor) ]
   in ProblemDescription formatting messageText
 
-someFunc :: IO ()
-someFunc = do
+someFunc :: Config -> IO ()
+someFunc config = do
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
   else
     let resultE = eitherDecode (B.fromStrict $ T.encodeUtf8 content) :: Either String CompilerOutput
-    in either (T.putStrLn . ("Parsing error: " <>) . T.pack) simplePrinter resultE
+    in either (T.putStrLn . ("Parsing error: " <>) . T.pack) (simplePrinter config) resultE
 
 
 -- SUPPORT FUNCTIONS --
