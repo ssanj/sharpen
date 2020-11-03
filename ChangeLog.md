@@ -1,3 +1,3 @@
-# Changelog for voelm
+# Changelog for Sharpen
 
 ## Unreleased changes

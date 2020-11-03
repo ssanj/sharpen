@@ -4,7 +4,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Lib
-    ( someFunc
+    ( sharpen
     ) where
 
 import System.Console.ANSI
@@ -29,6 +29,13 @@ import Data.List.NonEmpty (NonEmpty(..), (<|))
 
 type Printer = Config -> CompilerOutput -> IO ()
 
+sharpen :: Config -> IO ()
+sharpen config = do
+  content <- T.getContents
+  if T.null content then T.putStrLn "Success!"
+  else
+    let resultE = eitherDecode (B.fromStrict $ T.encodeUtf8 content) :: Either String CompilerOutput
+    in either (T.putStrLn . ("Parsing error: " <>) . T.pack) (simplePrinter config) resultE
 
 simplePrinter :: Printer
 simplePrinter config (CompilerOutput nonEmptyErrors errorType) =
@@ -95,14 +102,6 @@ problemDescription (MessageFormatting (MessageFormat {messageformatBold = doBold
   let formatting =
         catMaybes $ [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor) ]
   in ProblemDescription formatting messageText
-
-someFunc :: Config -> IO ()
-someFunc config = do
-  content <- T.getContents
-  if T.null content then T.putStrLn "Success!"
-  else
-    let resultE = eitherDecode (B.fromStrict $ T.encodeUtf8 content) :: Either String CompilerOutput
-    in either (T.putStrLn . ("Parsing error: " <>) . T.pack) (simplePrinter config) resultE
 
 
 -- SUPPORT FUNCTIONS --
