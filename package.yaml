@@ -30,6 +30,8 @@ library:
   - aeson
   - aeson-casing
   - deepseq
+  - ansi-terminal
+  - containers
 
 executables:
   voelm-exe:
