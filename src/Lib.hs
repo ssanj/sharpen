@@ -40,10 +40,8 @@ simpleErrorDescriptionInterpretter (CompilerErrorDescription errorDescriptions) 
     newLines 2
 
 newLines :: Int -> IO ()
-newLines n = traverse_ (\_ -> T.putStrLn ".") [1..n]
+newLines n = traverse_ (const $ T.putStrLn "") [1..n]
 
-
---  -- NAMING ERROR --------------------------------------------------- src/Save.elm
 renderFileProblems :: ProblemsAtFileLocation -> IO ()
 renderFileProblems pfl@(ProblemsAtFileLocation title filePath (s, e) problems) =
   do
