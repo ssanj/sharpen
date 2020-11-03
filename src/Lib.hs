@@ -37,18 +37,25 @@ simpleErrorDescriptionInterpretter :: CompilerErrorDescription -> IO ()
 simpleErrorDescriptionInterpretter (CompilerErrorDescription errorDescriptions) =
   do
     traverse_ (\ed -> newLines 2 >> renderFileProblems ed) errorDescriptions
-    T.putStrLn ""
+    newLines 2
 
 newLines :: Int -> IO ()
 newLines n = traverse_ (\_ -> T.putStrLn ".") [1..n]
 
+
+--  -- NAMING ERROR --------------------------------------------------- src/Save.elm
 renderFileProblems :: ProblemsAtFileLocation -> IO ()
-renderFileProblems (ProblemsAtFileLocation title filePath (s, e) problems) =
-  let coords = (showt s) <> ":" <> (showt e)
-      singleFileMessage = title <> ":" <> filePath <> ":" <> coords
-  in do
-    T.putStrLn singleFileMessage
+renderFileProblems pfl@(ProblemsAtFileLocation title filePath (s, e) problems) =
+  do
+    createTitleAndFile pfl
+    newLines 1
     traverse_  renderProblem problems
+
+createTitleAndFile :: ProblemsAtFileLocation -> IO ()
+createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
+  let coords = (showt s) <> ":" <> (showt e)
+      singleFileMessage = "-- " <> title <> " ---------- " <> filePath <> ":" <> coords
+  in withColour singleFileMessage Cyan
 
 renderProblem :: ProblemDescription -> IO ()
 renderProblem (ProblemDescription formatting message) =
@@ -110,3 +117,8 @@ maybeColor text =
 boolToMaybe :: Bool -> a -> Maybe a
 boolToMaybe predicate value = if predicate then Just value else Nothing
 
+withColour :: T.Text -> Color -> IO ()
+withColour text color = do
+  setSGR [(SetColor Foreground Dull color)]
+  T.putStrLn text
+  resetAnsi
