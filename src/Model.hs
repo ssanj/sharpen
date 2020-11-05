@@ -134,9 +134,9 @@ data Stats = StatsOn
 
 data Config =
   Config {
-    numErrors :: NumberOfErrors
-  , detail    :: OutputDetail
-  , stats     :: Stats
+    configNumErrors :: NumberOfErrors
+  , configDetail    :: OutputDetail
+  , configStats     :: Stats
   }  deriving stock (Eq, Show)
 
 defaultConfig :: Config

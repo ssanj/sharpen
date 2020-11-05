@@ -45,9 +45,9 @@ simplePrinter config (CompilerOutput nonEmptyErrors errorType) =
 simpleErrorDescriptionInterpretter :: Config -> CompilerErrorDescription -> IO ()
 simpleErrorDescriptionInterpretter config (CompilerErrorDescription errorDescriptions) =
   do
-    traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested (numErrors config) errorDescriptions)
+    traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested (configNumErrors config) errorDescriptions)
     newLines 2
-    when (stats config == StatsOn) $ do
+    when (configStats config == StatsOn) $ do
       printNumberOfCompilationErrors (N.length errorDescriptions)
       newLines 2
 
