@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: df54cb3b7d1246fae88fa51289f36c03758e64ca8af266fc6d97776f99297381
+-- hash: 944f8fa29b52e15e83e8962cb8957f5e48bea4c23d682e59d490e4dd948e6941
 
 name:           sharpen
 version:        0.1.0.0
@@ -47,6 +47,7 @@ library
 executable sharpen
   main-is: Main.hs
   other-modules:
+      Cmd
       Paths_sharpen
   hs-source-dirs:
       app
