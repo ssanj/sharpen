@@ -119,21 +119,25 @@ data ProblemsAtFileLocation =
 data CompilerErrorDescription = CompilerErrorDescription (N.NonEmpty ProblemsAtFileLocation)
 
 
-data OutputDetail = Full
-                | Succinct
-                | Oneline deriving stock (Eq, Show)
+data OutputDetail = FullDetail
+                  | ShortDetail
+                  | OnelineDetail deriving stock (Eq, Show)
 
 -- We could have other constructors in future
 -- | OnePerFile
 -- | Other Int
 data NumberOfErrors = AllErrors
-                    | OneError
+                    | OneError deriving stock (Eq, Show)
+
+data Stats = StatsOn
+           | StatsOff deriving stock (Eq, Show)
 
 data Config =
   Config {
     numErrors :: NumberOfErrors
-  , detail :: OutputDetail
-  }
+  , detail    :: OutputDetail
+  , stats     :: Stats
+  }  deriving stock (Eq, Show)
 
 defaultConfig :: Config
-defaultConfig = Config OneError Full
+defaultConfig = Config OneError FullDetail StatsOff

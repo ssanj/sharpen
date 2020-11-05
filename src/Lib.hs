@@ -10,13 +10,13 @@ module Lib
 import System.Console.ANSI
 import System.Console.ANSI.Types
 import System.IO
-import Control.DeepSeq
 import Model
 
 import Data.List (find)
 import Data.Maybe (catMaybes)
 import Data.Foldable (traverse_)
 import Data.Aeson (eitherDecode)
+import Control.Monad (when)
 
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
@@ -47,8 +47,9 @@ simpleErrorDescriptionInterpretter config (CompilerErrorDescription errorDescrip
   do
     traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested (numErrors config) errorDescriptions)
     newLines 2
-    printNumberOfCompilationErrors (N.length errorDescriptions)
-    newLines 2
+    when (stats config == StatsOn) $ do
+      printNumberOfCompilationErrors (N.length errorDescriptions)
+      newLines 2
 
 printNumberOfCompilationErrors :: Int -> IO ()
 printNumberOfCompilationErrors errors =
