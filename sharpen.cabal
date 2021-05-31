@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d3d47d97a76760c4ff8e5888d1611cc8cfc984801f73a1f6e2ef05f779c62837
+-- hash: 0a0e0297331bce647957ca4dc6bdfe1e18a256159b215a0d3bf380fbb8f4faa3
 
 name:           sharpen
 version:        0.2.0.0
@@ -62,7 +62,6 @@ test-suite sharpen-test
   main-is: Driver.hs
   other-modules:
       CompilerErrorParserSpec
-      SampleSpec
       Paths_sharpen
   hs-source-dirs:
       test
