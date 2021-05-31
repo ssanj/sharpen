@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 944f8fa29b52e15e83e8962cb8957f5e48bea4c23d682e59d490e4dd948e6941
+-- hash: 68c043cf4f5e0acbe1fae1dcff5caf4f1a773299b1102a6357e6eb4e6508d02f
 
 name:           sharpen
-version:        0.1.0.0
+version:        0.2.0.0
 description:    Please see the README on GitHub at <https://github.com/ssanj/sharpen#readme>
 homepage:       https://github.com/ssanj/sharpen#readme
 bug-reports:    https://github.com/ssanj/sharpen/issues

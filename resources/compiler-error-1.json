@@ -1,0 +1,137 @@
+{
+    "type": "compile-errors",
+    "errors":
+    [
+        {
+            "path": "/Volumes/Work/projects/code/frontend/scrib-elm/src/View.elm",
+            "name": "View",
+            "problems":
+            [
+                {
+                    "title": "NAMING ERROR",
+                    "region":
+                    {
+                        "start":
+                        {
+                            "line": 293,
+                            "column": 19
+                        },
+                        "end":
+                        {
+                            "line": 293,
+                            "column": 32
+                        }
+                    },
+                    "message":
+                    [
+                        "I cannot find a `NoteSelection` type:\n\n293| choseWhichNotes : NoteSelection -> List SC.NoteFull\n                       ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "RED",
+                            "string": "^^^^^^^^^^^^^"
+                        },
+                        "\nThese names seem close though:\n\n    ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "yellow",
+                            "string": "XNoteSelection"
+                        },
+                        "\n    ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "yellow",
+                            "string": "StorageAction"
+                        },
+                        "\n    ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "yellow",
+                            "string": "SC.NoteIdVersion"
+                        },
+                        "\n    ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "yellow",
+                            "string": "Dom.Element"
+                        },
+                        "\n\n",
+                        {
+                            "bold": false,
+                            "underline": true,
+                            "color": null,
+                            "string": "Hint"
+                        },
+                        ": Read <https://elm-lang.org/0.19.1/imports> to see how `import`\ndeclarations work in Elm."
+                    ]
+                },
+                {
+                    "title": "NAMING ERROR",
+                    "region":
+                    {
+                        "start":
+                        {
+                            "line": 285,
+                            "column": 27
+                        },
+                        "end":
+                        {
+                            "line": 285,
+                            "column": 40
+                        }
+                    },
+                    "message":
+                    [
+                        "I cannot find a `NoteSelection` type:\n\n285| noteSelection  : Model -> NoteSelection\n                               ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "RED",
+                            "string": "^^^^^^^^^^^^^"
+                        },
+                        "\nThese names seem close though:\n\n    ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "yellow",
+                            "string": "XNoteSelection"
+                        },
+                        "\n    ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "yellow",
+                            "string": "StorageAction"
+                        },
+                        "\n    ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "yellow",
+                            "string": "SC.NoteIdVersion"
+                        },
+                        "\n    ",
+                        {
+                            "bold": false,
+                            "underline": false,
+                            "color": "yellow",
+                            "string": "Dom.Element"
+                        },
+                        "\n\n",
+                        {
+                            "bold": false,
+                            "underline": true,
+                            "color": null,
+                            "string": "Hint"
+                        },
+                        ": Read <https://elm-lang.org/0.19.1/imports> to see how `import`\ndeclarations work in Elm."
+                    ]
+                }
+            ]
+        }
+    ]
+}
