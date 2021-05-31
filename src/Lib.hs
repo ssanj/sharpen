@@ -5,6 +5,7 @@
 
 module Lib
     ( sharpen
+    , decodeInput
     ) where
 
 import System.Console.ANSI
@@ -34,8 +35,11 @@ sharpen config = do
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
   else
-    let resultE = eitherDecode (B.fromStrict $ T.encodeUtf8 content) :: Either String CompilerOutput
+    let resultE = decodeInput content :: Either String CompilerOutput
     in either (T.putStrLn . ("Parsing error: " <>) . T.pack) (simplePrinter config) resultE
+
+decodeInput :: T.Text -> Either String CompilerOutput
+decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
 
 simplePrinter :: Printer
 simplePrinter config (CompilerOutput nonEmptyErrors errorType) =

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 68c043cf4f5e0acbe1fae1dcff5caf4f1a773299b1102a6357e6eb4e6508d02f
+-- hash: d3d47d97a76760c4ff8e5888d1611cc8cfc984801f73a1f6e2ef05f779c62837
 
 name:           sharpen
 version:        0.2.0.0
@@ -61,6 +61,7 @@ test-suite sharpen-test
   type: exitcode-stdio-1.0
   main-is: Driver.hs
   other-modules:
+      CompilerErrorParserSpec
       SampleSpec
       Paths_sharpen
   hs-source-dirs:
@@ -74,4 +75,5 @@ test-suite sharpen-test
     , tasty-discover
     , tasty-hedgehog
     , tasty-hunit
+    , text
   default-language: Haskell2010
