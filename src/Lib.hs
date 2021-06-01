@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
@@ -47,6 +46,7 @@ decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
 
 -- Should the Config contain the colour Map?
 -- Should we use a Reader/T  to pass through the context (ColorMap + Config) ?
+-- ReaderT IO Config ()
 simplePrinter :: M.Map T.Text Color -> Printer
 simplePrinter colorNamesMap config (CompilerOutput nonEmptyErrors errorType) =
   let desc = (processErrors colorNamesMap) <$> nonEmptyErrors
@@ -69,7 +69,7 @@ printNumberOfCompilationErrors errors =
 
 
 filterByRequested :: NumberOfErrors -> N.NonEmpty ProblemsAtFileLocation -> [ProblemsAtFileLocation]
-filterByRequested AllErrors = N.toList . id
+filterByRequested AllErrors = N.toList
 filterByRequested OneError  = N.take 1
 
 
@@ -87,7 +87,7 @@ renderFileProblems pfl@(ProblemsAtFileLocation title filePath (s, e) problems) =
 
 createTitleAndFile :: ProblemsAtFileLocation -> IO ()
 createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
-  let coords = (showt s) <> ":" <> (showt e)
+  let coords = showt s <> ":" <> showt e
       singleFileMessage = "-- " <> title <> " ---------- " <> filePath <> ":" <> coords
   in withColourInline singleFileMessage Cyan >> newLines 1
 
@@ -99,9 +99,9 @@ renderProblem (ProblemDescription formatting message) =
 
 
 renderFormatting :: MessageFormatType -> IO ()
-renderFormatting (ColourFormat color) = setSGR [(SetColor Foreground Dull color)]
-renderFormatting UnderlineFormat      = setSGR [(SetUnderlining SingleUnderline)]
-renderFormatting BoldFormat           = setSGR [(SetConsoleIntensity BoldIntensity)]
+renderFormatting (ColourFormat color) = setSGR [SetColor Foreground Dull color]
+renderFormatting UnderlineFormat      = setSGR [SetUnderlining SingleUnderline]
+renderFormatting BoldFormat           = setSGR [SetConsoleIntensity BoldIntensity]
 
 
 resetAnsi :: IO ()
@@ -119,11 +119,12 @@ problemsAtFileLocation colorNamesMap filePath (Problem title (Region (LineAndCol
   in ProblemsAtFileLocation title filePath (start, end) problemDescriptions
 
 
+-- Document how this record syntax works with `doBold`, `doUnderline` etc
 problemDescription ::  M.Map T.Text Color -> Message -> ProblemDescription
 problemDescription _ (MessageLine (MessageText messageText)) = ProblemDescription [] messageText
 problemDescription colorNamesMap (MessageFormatting (MessageFormat {messageformatBold = doBold, messageformatUnderline = doUnderline, messageformatColor = doColor, messageformatString = messageText})) =
   let formatting =
-        catMaybes $ [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor colorNamesMap) ]
+        catMaybes [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor colorNamesMap) ]
   in ProblemDescription formatting messageText
 
 
@@ -153,6 +154,6 @@ boolToMaybe predicate value = if predicate then Just value else Nothing
 
 withColourInline :: T.Text -> Color -> IO ()
 withColourInline text color = do
-  setSGR [(SetColor Foreground Dull color)]
+  setSGR [SetColor Foreground Dull color]
   T.putStr text
   resetAnsi
