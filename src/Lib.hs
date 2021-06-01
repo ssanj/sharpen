@@ -16,7 +16,7 @@ import Data.List (find)
 import Data.Maybe (catMaybes)
 import Data.Foldable (traverse_)
 import Data.Aeson (eitherDecode)
-import Control.Monad (when)
+import Control.Monad (when, join)
 
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
@@ -49,8 +49,8 @@ decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
 -- ReaderT IO Config ()
 simplePrinter :: M.Map T.Text Color -> Printer
 simplePrinter colorNamesMap config (CompilerOutput nonEmptyErrors errorType) =
-  let desc = (processErrors colorNamesMap) <$> nonEmptyErrors
-  in simpleErrorDescriptionInterpretter config $ CompilerErrorDescription $ desc >>= id
+  let desc = processErrors colorNamesMap <$> nonEmptyErrors
+  in simpleErrorDescriptionInterpretter config . CompilerErrorDescription . join $ desc
 
 
 simpleErrorDescriptionInterpretter :: Config -> CompilerErrorDescription -> IO ()
@@ -110,7 +110,7 @@ resetAnsi = setSGR [Reset]
 
 -- TODO: Do we need errorName ?
 processErrors :: M.Map T.Text Color -> Error -> N.NonEmpty ProblemsAtFileLocation
-processErrors colorNamesMap (Error filePath _ problems) = (problemsAtFileLocation colorNamesMap filePath) <$> problems
+processErrors colorNamesMap (Error filePath _ problems) = problemsAtFileLocation colorNamesMap filePath <$> problems
 
 
 problemsAtFileLocation :: M.Map T.Text Color -> T.Text -> Problem -> ProblemsAtFileLocation
@@ -122,7 +122,7 @@ problemsAtFileLocation colorNamesMap filePath (Problem title (Region (LineAndCol
 -- Document how this record syntax works with `doBold`, `doUnderline` etc
 problemDescription ::  M.Map T.Text Color -> Message -> ProblemDescription
 problemDescription _ (MessageLine (MessageText messageText)) = ProblemDescription [] messageText
-problemDescription colorNamesMap (MessageFormatting (MessageFormat {messageformatBold = doBold, messageformatUnderline = doUnderline, messageformatColor = doColor, messageformatString = messageText})) =
+problemDescription colorNamesMap (MessageFormatting MessageFormat {messageformatBold = doBold, messageformatUnderline = doUnderline, messageformatColor = doColor, messageformatString = messageText}) =
   let formatting =
         catMaybes [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor colorNamesMap) ]
   in ProblemDescription formatting messageText
