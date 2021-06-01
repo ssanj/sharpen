@@ -38,16 +38,18 @@ sharpen config = do
   if T.null content then T.putStrLn "Success!"
   else
     let resultE = decodeInput content :: Either String CompilerOutput
-    in either (T.putStrLn . ("Parsing error: " <>) . T.pack) (simplePrinter config) resultE
+    in either (T.putStrLn . ("Parsing error: " <>) . T.pack) (simplePrinter colorNames config) resultE
 
 
 decodeInput :: T.Text -> Either String CompilerOutput
 decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
 
 
-simplePrinter :: Printer
-simplePrinter config (CompilerOutput nonEmptyErrors errorType) =
-  let desc = processErrors <$> nonEmptyErrors
+-- Should the Config contain the colour Map?
+-- Should we use a Reader/T  to pass through the context (ColorMap + Config) ?
+simplePrinter :: M.Map T.Text Color -> Printer
+simplePrinter colorNamesMap config (CompilerOutput nonEmptyErrors errorType) =
+  let desc = (processErrors colorNamesMap) <$> nonEmptyErrors
   in simpleErrorDescriptionInterpretter config $ CompilerErrorDescription $ desc >>= id
 
 
@@ -107,21 +109,21 @@ resetAnsi = setSGR [Reset]
 
 
 -- TODO: Do we need errorName ?
-processErrors :: Error -> N.NonEmpty ProblemsAtFileLocation
-processErrors (Error filePath _ problems) = (problemsAtFileLocation filePath) <$> problems
+processErrors :: M.Map T.Text Color -> Error -> N.NonEmpty ProblemsAtFileLocation
+processErrors colorNamesMap (Error filePath _ problems) = (problemsAtFileLocation colorNamesMap filePath) <$> problems
 
 
-problemsAtFileLocation :: T.Text -> Problem -> ProblemsAtFileLocation
-problemsAtFileLocation filePath (Problem title (Region (LineAndColumn start end) _) messages) =
-  let problemDescriptions :: N.NonEmpty ProblemDescription = fmap problemDescription messages
+problemsAtFileLocation :: M.Map T.Text Color -> T.Text -> Problem -> ProblemsAtFileLocation
+problemsAtFileLocation colorNamesMap filePath (Problem title (Region (LineAndColumn start end) _) messages) =
+  let problemDescriptions :: N.NonEmpty ProblemDescription = fmap (problemDescription colorNamesMap) messages
   in ProblemsAtFileLocation title filePath (start, end) problemDescriptions
 
 
-problemDescription :: Message -> ProblemDescription
-problemDescription (MessageLine (MessageText messageText)) = ProblemDescription [] messageText
-problemDescription (MessageFormatting (MessageFormat {messageformatBold = doBold, messageformatUnderline = doUnderline, messageformatColor = doColor, messageformatString = messageText})) =
+problemDescription ::  M.Map T.Text Color -> Message -> ProblemDescription
+problemDescription _ (MessageLine (MessageText messageText)) = ProblemDescription [] messageText
+problemDescription colorNamesMap (MessageFormatting (MessageFormat {messageformatBold = doBold, messageformatUnderline = doUnderline, messageformatColor = doColor, messageformatString = messageText})) =
   let formatting =
-        catMaybes $ [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor) ]
+        catMaybes $ [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor colorNamesMap) ]
   in ProblemDescription formatting messageText
 
 
@@ -139,10 +141,9 @@ colorNames =
   in M.fromList colorNamePair
 
 
-maybeColor :: T.Text -> Maybe Color
-maybeColor text =
+maybeColor :: M.Map T.Text Color -> T.Text -> Maybe Color
+maybeColor colorNamesMap text =
   let upperText     = T.toUpper text
-      colorNamesMap = colorNames
   in M.lookup upperText colorNamesMap
 
 
