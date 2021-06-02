@@ -12,14 +12,18 @@ import Model              (defaultConfig, OutputDetail(..), Config(..), NumberOf
 import System.Environment (getArgs)
 import Data.List          (intercalate)
 
+
 data RunOrInfo = Info String
                | Run Config
+
 
 usingArgs :: IO (Either String RunOrInfo)
 usingArgs = processArgs <$> getArgs
 
+
 processArgs :: [String] -> Either String RunOrInfo
 processArgs = extractConfig defaultConfig
+
 
 -- TODO: Can we use the fact that we "know" args are not empty?
 extractConfig :: Config -> [String] -> Either String RunOrInfo
@@ -49,6 +53,7 @@ extractConfig c args =
 
     other -> Left usageString
 
+
 usageString :: String
 usageString =
   "Usage: sharpen --detail [full|short|oneline] --errors [all|one] --stats [on|off]"         <>
@@ -66,10 +71,12 @@ usageString =
     "         "                                                                              <>
   "Show stats on number of errors. One of 'on' or 'off'. The default is 'off'"
 
+
 errors :: String -> Either String NumberOfErrors
 errors "all" = Right AllErrors
 errors "one" = Right OneError
 errors other = Left $ errorString "errors" other ["all", "one"]
+
 
 detail :: String -> Either String OutputDetail
 detail  "full"    = Right FullDetail
@@ -77,10 +84,12 @@ detail  "short"   = Right ShortDetail
 detail  "oneline" = Right OnelineDetail
 detail  other     = Left $ errorString "detail" other ["full", "short", "oneline"]
 
+
 stats :: String -> Either String Stats
 stats "on"  = Right StatsOn
 stats "off" = Right StatsOff
 stats other = Left $ errorString "stats" other ["on", "off"]
+
 
 errorString :: String -> String -> [String] -> String
 errorString paramName invalidOption validOptions =

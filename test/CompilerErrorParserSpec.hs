@@ -28,7 +28,7 @@ failWithError e =
 
 assertCompilerOutput :: CompilerOutput -> Assertion
 assertCompilerOutput co = do
-    "compile-errors" @?= (compileroutputType co)
+    "compile-errors" @?= compileroutputType co
     let firstProblem = N.head . errorProblems . N.head . compileroutputErrors $ co
     firstProblem @?= namingError
 
@@ -69,8 +69,8 @@ namingError =
                 , message13
                 ]
 
-        regionStart = (LineAndColumn 293 19)
-        regionEnd   = (LineAndColumn 293 32)
+        regionStart = LineAndColumn 293 19
+        regionEnd   = LineAndColumn 293 32
         region      = Region regionStart regionEnd
 
 
