@@ -4,7 +4,6 @@
 
 module Lib
     ( sharpen
-    , decodeInput
     ) where
 
 import System.Console.ANSI
@@ -21,20 +20,10 @@ import Control.Monad (when, join)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
 import qualified Data.Text.Encoding   as T
-import qualified Data.ByteString.Lazy as B
 import qualified Data.Map.Strict      as M
 import qualified Data.List.NonEmpty   as N
 
 import Data.List.NonEmpty (NonEmpty(..), (<|))
-
-
-type ColorMap = M.Map T.Text Color
-
-data RuntimeConfig =
-  RuntimeConfig {
-    runtimeConfigConfig :: Config
-  , runtimeConfigColorNames :: M.Map T.Text Color
-  }
 
 
 sharpen :: Config -> IO ()
@@ -54,17 +43,11 @@ sharpen config = do
     in either errorIO successIO resultE
 
 
--- Should this be in here? It seems dissimilar to everything else.
-decodeInput :: T.Text -> Either String CompilerOutput
-decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
-
-
--- Should we use a Reader/T  to pass through the context (ColorMap + Config) ?
 simplePrinter :: RuntimeConfig -> CompilerOutput -> IO ()
 simplePrinter rc (CompilerOutput nonEmptyErrors errorType) = do
   let
-    desc :: N.NonEmpty (NonEmpty ProblemsAtFileLocation)
-    desc = processErrors <$> nonEmptyErrors
+    desc :: N.NonEmpty ProblemsAtFileLocation
+    desc = processErrors =<< nonEmptyErrors
 
     processErrors :: Error -> N.NonEmpty ProblemsAtFileLocation
     processErrors (Error filePath _ problems) = problemsAtFileLocation filePath <$> problems
@@ -83,7 +66,7 @@ simplePrinter rc (CompilerOutput nonEmptyErrors errorType) = do
             catMaybes [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor colorNamesMap) ]
       in ProblemDescription formatting messageText
 
-  simpleErrorDescriptionInterpretter rc . CompilerErrorDescription . join $ desc
+  simpleErrorDescriptionInterpretter rc $ CompilerErrorDescription desc
 
 
 simpleErrorDescriptionInterpretter :: RuntimeConfig -> CompilerErrorDescription ->  IO ()
@@ -151,14 +134,14 @@ showt :: Show a => a -> T.Text
 showt = T.pack . show
 
 
-colorNames :: M.Map T.Text Color
+colorNames :: ColorMap
 colorNames =
   let allColors     = enumFromTo (minBound::Color) (maxBound:: Color)
       colorNamePair = (\color -> (T.toUpper . showt $ color, color)) <$> allColors
   in M.fromList colorNamePair
 
 
-maybeColor :: M.Map T.Text Color -> T.Text -> Maybe Color
+maybeColor :: ColorMap -> T.Text -> Maybe Color
 maybeColor colorNamesMap text =
   let upperText     = T.toUpper text
   in M.lookup upperText colorNamesMap

@@ -13,10 +13,22 @@ import System.Console.ANSI.Types
 import Data.Aeson.Casing (aesonPrefix, camelCase)
 import Control.Applicative ((<|>))
 
+import qualified Data.ByteString.Lazy as B
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
 import qualified Data.Text.Encoding   as T
 import qualified Data.List.NonEmpty   as N
+import qualified Data.Map.Strict      as M
+
+
+type ColorMap = M.Map T.Text Color
+
+
+data RuntimeConfig =
+  RuntimeConfig {
+    runtimeConfigConfig :: Config
+  , runtimeConfigColorNames :: ColorMap
+  }
 
 
 data LineAndColumn =
@@ -164,3 +176,7 @@ data Config =
 
 defaultConfig :: Config
 defaultConfig = Config OneError FullDetail StatsOff
+
+
+decodeInput :: T.Text -> Either String CompilerOutput
+decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)

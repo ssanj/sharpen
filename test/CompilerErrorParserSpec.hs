@@ -5,7 +5,6 @@ module CompilerErrorParserSpec where
 
 import Model
 
-import Lib                  (decodeInput)
 import Test.Tasty.HUnit     (assertFailure, (@?=), Assertion)
 import Data.List.NonEmpty   (NonEmpty((:|)))
 
