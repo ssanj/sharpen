@@ -81,7 +81,7 @@ instance FromJSON Message where
   parseJSON = \v ->
     let messageLineParser       :: Value -> Parser Message = \v -> fmap MessageLine (parseJSON v :: Parser MessageText)
         messageFormattingParser :: Value -> Parser Message = \v -> fmap MessageFormatting (parseJSON v :: Parser MessageFormat)
-    in (messageLineParser v) <|> (messageFormattingParser v)
+    in messageLineParser v <|> messageFormattingParser v
 
 
 instance FromJSON MessageText where
@@ -135,7 +135,7 @@ data ProblemsAtFileLocation =
   }
 
 
-data CompilerErrorDescription = CompilerErrorDescription (N.NonEmpty ProblemsAtFileLocation)
+newtype CompilerErrorDescription = CompilerErrorDescription (N.NonEmpty ProblemsAtFileLocation)
 
 
 data OutputDetail = FullDetail
