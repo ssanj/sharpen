@@ -32,7 +32,6 @@ library:
   - deepseq
   - ansi-terminal
   - containers
-  - mtl
 
 executables:
   sharpen:

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3d4511b5c0c9f152c7f1b118b2507c68176683e9a9fac1e9ae2bad05a63b95d3
+-- hash: 0a0e0297331bce647957ca4dc6bdfe1e18a256159b215a0d3bf380fbb8f4faa3
 
 name:           sharpen
 version:        0.2.0.0
@@ -41,7 +41,6 @@ library
     , bytestring
     , containers
     , deepseq
-    , mtl
     , text
   default-language: Haskell2010
 

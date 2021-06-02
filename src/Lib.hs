@@ -11,7 +11,6 @@ import System.Console.ANSI
 import System.Console.ANSI.Types
 import System.IO
 import Model
-import Control.Monad.Reader
 
 import Data.List (find)
 import Data.Maybe (catMaybes)
@@ -27,7 +26,6 @@ import qualified Data.Map.Strict      as M
 import qualified Data.List.NonEmpty   as N
 
 import Data.List.NonEmpty (NonEmpty(..), (<|))
-import Control.Monad.IO.Class (liftIO)
 
 
 type ColorMap = M.Map T.Text Color
@@ -51,7 +49,7 @@ sharpen config = do
         errorIO = T.putStrLn . ("Parsing error: " <>) . T.pack
 
         successIO :: CompilerOutput -> IO ()
-        successIO compilerOutput = runReaderT (simplePrinter compilerOutput) runtimeConfig
+        successIO = simplePrinter runtimeConfig
 
     in either errorIO successIO resultE
 
@@ -62,9 +60,8 @@ decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
 
 
 -- Should we use a Reader/T  to pass through the context (ColorMap + Config) ?
-simplePrinter :: CompilerOutput -> ReaderT RuntimeConfig IO ()
-simplePrinter (CompilerOutput nonEmptyErrors errorType) = do
-  colorNamesMap <- asks runtimeConfigColorNames
+simplePrinter :: RuntimeConfig -> CompilerOutput -> IO ()
+simplePrinter rc (CompilerOutput nonEmptyErrors errorType) = do
   let
     desc :: N.NonEmpty (NonEmpty ProblemsAtFileLocation)
     desc = processErrors <$> nonEmptyErrors
@@ -81,22 +78,21 @@ simplePrinter (CompilerOutput nonEmptyErrors errorType) = do
     problemDescription ::  Message -> ProblemDescription
     problemDescription (MessageLine (MessageText messageText)) = ProblemDescription [] messageText
     problemDescription (MessageFormatting MessageFormat {messageformatBold = doBold, messageformatUnderline = doUnderline, messageformatColor = doColor, messageformatString = messageText}) =
-      let formatting =
+      let colorNamesMap = runtimeConfigColorNames rc
+          formatting =
             catMaybes [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor colorNamesMap) ]
       in ProblemDescription formatting messageText
 
-  simpleErrorDescriptionInterpretter . CompilerErrorDescription . join $ desc
+  simpleErrorDescriptionInterpretter rc . CompilerErrorDescription . join $ desc
 
 
-simpleErrorDescriptionInterpretter :: CompilerErrorDescription ->  ReaderT RuntimeConfig IO ()
-simpleErrorDescriptionInterpretter (CompilerErrorDescription errorDescriptions) = do
-  config <- asks runtimeConfigConfig
-  liftIO $ do
-    traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested (configNumErrors config) errorDescriptions)
+simpleErrorDescriptionInterpretter :: RuntimeConfig -> CompilerErrorDescription ->  IO ()
+simpleErrorDescriptionInterpretter RuntimeConfig { runtimeConfigConfig = config }  (CompilerErrorDescription errorDescriptions) = do
+  traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested (configNumErrors config) errorDescriptions)
+  newLines 2
+  when (configStats config == StatsOn) $ do
+    printNumberOfCompilationErrors (N.length errorDescriptions)
     newLines 2
-    when (configStats config == StatsOn) $ do
-      printNumberOfCompilationErrors (N.length errorDescriptions)
-      newLines 2
 
 
 printNumberOfCompilationErrors :: Int -> IO ()
