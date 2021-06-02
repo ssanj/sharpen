@@ -6,10 +6,9 @@ module Lib
     ( sharpen
     ) where
 
-import System.Console.ANSI
-import System.Console.ANSI.Types
 import System.IO
 import Model
+import ColorMap
 
 import Data.List (find)
 import Data.Maybe (catMaybes)
@@ -28,7 +27,7 @@ import Data.List.NonEmpty (NonEmpty(..), (<|))
 
 sharpen :: Config -> IO ()
 sharpen config = do
-  let runtimeConfig = RuntimeConfig config colorNames
+  let runtimeConfig = RuntimeConfig config allColorNamesMap
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
   else
@@ -80,7 +79,7 @@ simpleErrorDescriptionInterpretter RuntimeConfig { runtimeConfigConfig = config 
 
 printNumberOfCompilationErrors :: Int -> IO ()
 printNumberOfCompilationErrors errors =
-  T.putStr "Compilation errors: " >> withColourInline (showt errors) Red
+  T.putStr "Compilation errors: " >> withColourInline (showt errors) errorColor
 
 
 filterByRequested :: NumberOfErrors -> N.NonEmpty ProblemsAtFileLocation -> [ProblemsAtFileLocation]
@@ -104,55 +103,10 @@ createTitleAndFile :: ProblemsAtFileLocation -> IO ()
 createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
   let coords = showt s <> ":" <> showt e
       singleFileMessage = "-- " <> title <> " ---------- " <> filePath <> ":" <> coords
-  in withColourInline singleFileMessage Cyan >> newLines 1
+  in withColourInline singleFileMessage titleColor >> newLines 1
 
 
 renderProblem :: ProblemDescription -> IO ()
 renderProblem (ProblemDescription formatting message) =
   let formattingApplied = traverse_ renderFormatting formatting
   in formattingApplied >> T.putStr message >> resetAnsi
-
-
-renderFormatting :: MessageFormatType -> IO ()
-renderFormatting (ColourFormat color) = setSGR [SetColor Foreground Dull color]
-renderFormatting UnderlineFormat      = setSGR [SetUnderlining SingleUnderline]
-renderFormatting BoldFormat           = setSGR [SetConsoleIntensity BoldIntensity]
-
-
-resetAnsi :: IO ()
-resetAnsi = setSGR [Reset]
-
-
--- TODO: Do we need errorName ?
-
-
-
--- SUPPORT FUNCTIONS --
-
-
-showt :: Show a => a -> T.Text
-showt = T.pack . show
-
-
-colorNames :: ColorMap
-colorNames =
-  let allColors     = enumFromTo (minBound::Color) (maxBound:: Color)
-      colorNamePair = (\color -> (T.toUpper . showt $ color, color)) <$> allColors
-  in M.fromList colorNamePair
-
-
-maybeColor :: ColorMap -> T.Text -> Maybe Color
-maybeColor colorNamesMap text =
-  let upperText     = T.toUpper text
-  in M.lookup upperText colorNamesMap
-
-
-boolToMaybe :: Bool -> a -> Maybe a
-boolToMaybe predicate value = if predicate then Just value else Nothing
-
-
-withColourInline :: T.Text -> Color -> IO ()
-withColourInline text color = do
-  setSGR [SetColor Foreground Dull color]
-  T.putStr text
-  resetAnsi

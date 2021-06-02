@@ -180,3 +180,14 @@ defaultConfig = Config OneError FullDetail StatsOff
 
 decodeInput :: T.Text -> Either String CompilerOutput
 decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
+
+
+-- SUPPORT FUNCTIONS --
+
+
+showt :: Show a => a -> T.Text
+showt = T.pack . show
+
+
+boolToMaybe :: Bool -> a -> Maybe a
+boolToMaybe predicate value = if predicate then Just value else Nothing

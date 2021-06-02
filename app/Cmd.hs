@@ -93,6 +93,6 @@ stats other = Left $ errorString "stats" other ["on", "off"]
 
 errorString :: String -> String -> [String] -> String
 errorString paramName invalidOption validOptions =
-  "Invalid " <> paramName <> " parameter: " <> invalidOption <> ", valid values are: [" <> (intercalate "|" validOptions)  <> "]"
+  "Invalid " <> paramName <> " parameter: " <> invalidOption <> ", valid values are: [" <> intercalate "|" validOptions  <> "]"
 
 -- sharpen --detail [full|short|oneline] --errors [all|one] --stats [on|off]
