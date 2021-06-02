@@ -30,6 +30,8 @@ import Data.List.NonEmpty (NonEmpty(..), (<|))
 import Control.Monad.IO.Class (liftIO)
 
 
+type ColorMap = M.Map T.Text Color
+
 data RuntimeConfig =
   RuntimeConfig {
     runtimeConfigConfig :: Config
@@ -59,13 +61,30 @@ decodeInput :: T.Text -> Either String CompilerOutput
 decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
 
 
--- Should the Config contain the colour Map?
 -- Should we use a Reader/T  to pass through the context (ColorMap + Config) ?
--- ReaderT IO Config ()
-simplePrinter :: CompilerOutput -> ReaderT RuntimeConfig IO ()  --M.Map T.Text Color -> PrinterIO
+simplePrinter :: CompilerOutput -> ReaderT RuntimeConfig IO ()
 simplePrinter (CompilerOutput nonEmptyErrors errorType) = do
   colorNamesMap <- asks runtimeConfigColorNames
-  let desc = processErrors colorNamesMap <$> nonEmptyErrors
+  let
+    desc :: N.NonEmpty (NonEmpty ProblemsAtFileLocation)
+    desc = processErrors <$> nonEmptyErrors
+
+    processErrors :: Error -> N.NonEmpty ProblemsAtFileLocation
+    processErrors (Error filePath _ problems) = problemsAtFileLocation filePath <$> problems
+
+    problemsAtFileLocation ::T.Text -> Problem -> ProblemsAtFileLocation
+    problemsAtFileLocation filePath (Problem title (Region (LineAndColumn start end) _) messages) =
+      let problemDescriptions :: N.NonEmpty ProblemDescription = fmap problemDescription messages
+      in ProblemsAtFileLocation title filePath (start, end) problemDescriptions
+
+    -- Document how this record syntax works with `doBold`, `doUnderline` etc
+    problemDescription ::  Message -> ProblemDescription
+    problemDescription (MessageLine (MessageText messageText)) = ProblemDescription [] messageText
+    problemDescription (MessageFormatting MessageFormat {messageformatBold = doBold, messageformatUnderline = doUnderline, messageformatColor = doColor, messageformatString = messageText}) =
+      let formatting =
+            catMaybes [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor colorNamesMap) ]
+      in ProblemDescription formatting messageText
+
   simpleErrorDescriptionInterpretter . CompilerErrorDescription . join $ desc
 
 
@@ -126,23 +145,7 @@ resetAnsi = setSGR [Reset]
 
 
 -- TODO: Do we need errorName ?
-processErrors :: M.Map T.Text Color -> Error -> N.NonEmpty ProblemsAtFileLocation
-processErrors colorNamesMap (Error filePath _ problems) = problemsAtFileLocation colorNamesMap filePath <$> problems
 
-
-problemsAtFileLocation :: M.Map T.Text Color -> T.Text -> Problem -> ProblemsAtFileLocation
-problemsAtFileLocation colorNamesMap filePath (Problem title (Region (LineAndColumn start end) _) messages) =
-  let problemDescriptions :: N.NonEmpty ProblemDescription = fmap (problemDescription colorNamesMap) messages
-  in ProblemsAtFileLocation title filePath (start, end) problemDescriptions
-
-
--- Document how this record syntax works with `doBold`, `doUnderline` etc
-problemDescription ::  M.Map T.Text Color -> Message -> ProblemDescription
-problemDescription _ (MessageLine (MessageText messageText)) = ProblemDescription [] messageText
-problemDescription colorNamesMap (MessageFormatting MessageFormat {messageformatBold = doBold, messageformatUnderline = doUnderline, messageformatColor = doColor, messageformatString = messageText}) =
-  let formatting =
-        catMaybes [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor colorNamesMap) ]
-  in ProblemDescription formatting messageText
 
 
 -- SUPPORT FUNCTIONS --
