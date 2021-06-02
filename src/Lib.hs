@@ -11,6 +11,7 @@ import System.Console.ANSI
 import System.Console.ANSI.Types
 import System.IO
 import Model
+import Control.Monad.Reader
 
 import Data.List (find)
 import Data.Maybe (catMaybes)
@@ -26,20 +27,34 @@ import qualified Data.Map.Strict      as M
 import qualified Data.List.NonEmpty   as N
 
 import Data.List.NonEmpty (NonEmpty(..), (<|))
+import Control.Monad.IO.Class (liftIO)
 
 
-type Printer = Config -> CompilerOutput -> IO ()
+data RuntimeConfig =
+  RuntimeConfig {
+    runtimeConfigConfig :: Config
+  , runtimeConfigColorNames :: M.Map T.Text Color
+  }
 
 
 sharpen :: Config -> IO ()
 sharpen config = do
+  let runtimeConfig = RuntimeConfig config colorNames
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
   else
     let resultE = decodeInput content :: Either String CompilerOutput
-    in either (T.putStrLn . ("Parsing error: " <>) . T.pack) (simplePrinter colorNames config) resultE
+
+        errorIO :: String -> IO ()
+        errorIO = T.putStrLn . ("Parsing error: " <>) . T.pack
+
+        successIO :: CompilerOutput -> IO ()
+        successIO compilerOutput = runReaderT (simplePrinter compilerOutput) runtimeConfig
+
+    in either errorIO successIO resultE
 
 
+-- Should this be in here? It seems dissimilar to everything else.
 decodeInput :: T.Text -> Either String CompilerOutput
 decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
 
@@ -47,15 +62,17 @@ decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
 -- Should the Config contain the colour Map?
 -- Should we use a Reader/T  to pass through the context (ColorMap + Config) ?
 -- ReaderT IO Config ()
-simplePrinter :: M.Map T.Text Color -> Printer
-simplePrinter colorNamesMap config (CompilerOutput nonEmptyErrors errorType) =
+simplePrinter :: CompilerOutput -> ReaderT RuntimeConfig IO ()  --M.Map T.Text Color -> PrinterIO
+simplePrinter (CompilerOutput nonEmptyErrors errorType) = do
+  colorNamesMap <- asks runtimeConfigColorNames
   let desc = processErrors colorNamesMap <$> nonEmptyErrors
-  in simpleErrorDescriptionInterpretter config . CompilerErrorDescription . join $ desc
+  simpleErrorDescriptionInterpretter . CompilerErrorDescription . join $ desc
 
 
-simpleErrorDescriptionInterpretter :: Config -> CompilerErrorDescription -> IO ()
-simpleErrorDescriptionInterpretter config (CompilerErrorDescription errorDescriptions) =
-  do
+simpleErrorDescriptionInterpretter :: CompilerErrorDescription ->  ReaderT RuntimeConfig IO ()
+simpleErrorDescriptionInterpretter (CompilerErrorDescription errorDescriptions) = do
+  config <- asks runtimeConfigConfig
+  liftIO $ do
     traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested (configNumErrors config) errorDescriptions)
     newLines 2
     when (configStats config == StatsOn) $ do
