@@ -31,19 +31,19 @@ sharpen config = do
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
   else
-    let resultE = decodeInput content :: Either String CompilerOutput
+    let resultE = decodeInput content :: Either String CompilerError
 
         errorIO :: String -> IO ()
         errorIO = T.putStrLn . ("Parsing error: " <>) . T.pack
 
-        successIO :: CompilerOutput -> IO ()
+        successIO :: CompilerError -> IO ()
         successIO = simplePrinter runtimeConfig
 
     in either errorIO successIO resultE
 
 
-simplePrinter :: RuntimeConfig -> CompilerOutput -> IO ()
-simplePrinter rc (CompilerOutput nonEmptyErrors errorType) = do
+simplePrinter :: RuntimeConfig -> CompilerError -> IO ()
+simplePrinter rc (CompilerError nonEmptyErrors errorType) = do
   let
     desc :: N.NonEmpty ProblemsAtFileLocation
     desc = processErrors =<< nonEmptyErrors

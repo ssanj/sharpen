@@ -62,10 +62,18 @@ data Error =
   } deriving stock (Generic, Eq, Show)
 
 
-data CompilerOutput =
-  CompilerOutput {
-    compileroutputErrors :: N.NonEmpty Error
-  , compileroutputType :: T.Text
+data GeneralError =
+  GeneralError {
+    generalerrorPath     :: T.Text
+  , generalerrorTitle    :: T.Text
+  , generalerrorMessages :: N.NonEmpty Message
+  } deriving stock (Generic, Eq, Show)
+
+
+data CompilerError =
+  CompilerError {
+    compilererrorErrors :: N.NonEmpty Error
+  , compilererrorType :: T.Text
   } deriving stock (Generic, Eq, Show)
 
 
@@ -108,6 +116,7 @@ instance FromJSON MessageFormat where
       <*> v .:? "color"
       <*> v .: "string"
 
+
 instance FromJSON LineAndColumn where
    parseJSON = genericParseJSON jsonOptions
 
@@ -124,7 +133,11 @@ instance FromJSON Error where
    parseJSON = genericParseJSON jsonOptions
 
 
-instance FromJSON CompilerOutput where
+instance FromJSON CompilerError where
+   parseJSON = genericParseJSON jsonOptions
+
+
+instance FromJSON GeneralError where
    parseJSON = genericParseJSON jsonOptions
 
 
@@ -178,7 +191,7 @@ defaultConfig :: Config
 defaultConfig = Config OneError FullDetail StatsOff
 
 
-decodeInput :: T.Text -> Either String CompilerOutput
+decodeInput :: T.Text -> Either String CompilerError
 decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
 
 

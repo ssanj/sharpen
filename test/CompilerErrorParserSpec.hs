@@ -16,8 +16,8 @@ import qualified Data.List.NonEmpty as N
 unit_decodeCompilerError :: Assertion
 unit_decodeCompilerError = do
     input <- getInput "resources/compiler-error-1.json"
-    let decodedE = decodeInput input :: Either String CompilerOutput
-    either failWithError assertCompilerOutput decodedE
+    let decodedE = decodeInput input :: Either String CompilerError
+    either failWithError assertCompilerError decodedE
 
 
 failWithError :: String -> Assertion
@@ -26,10 +26,10 @@ failWithError e =
     in assertFailure ("Could not decode input: " <> errorMessage)
 
 
-assertCompilerOutput :: CompilerOutput -> Assertion
-assertCompilerOutput co = do
-    "compile-errors" @?= compileroutputType co
-    let firstProblem = N.head . errorProblems . N.head . compileroutputErrors $ co
+assertCompilerError :: CompilerError -> Assertion
+assertCompilerError compilerError = do
+    "compile-errors" @?= compilererrorType compilerError
+    let firstProblem = N.head . errorProblems . N.head . compilererrorErrors $ compilerError
     firstProblem @?= namingError
 
 
