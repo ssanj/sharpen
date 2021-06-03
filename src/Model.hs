@@ -62,6 +62,10 @@ data Error =
   } deriving stock (Generic, Eq, Show)
 
 
+data ElmCompilerOutput = ElmError CompilerError
+                       | OtherError GeneralError deriving stock (Generic, Eq, Show)
+
+
 data GeneralError =
   GeneralError {
     generalerrorPath     :: T.Text
@@ -102,6 +106,13 @@ instance FromJSON Message where
     let messageLineParser       :: Value -> Parser Message = \v -> fmap MessageLine (parseJSON v :: Parser MessageText)
         messageFormattingParser :: Value -> Parser Message = \v -> fmap MessageFormatting (parseJSON v :: Parser MessageFormat)
     in messageLineParser v <|> messageFormattingParser v
+
+
+instance FromJSON ElmCompilerOutput where
+  parseJSON = \v ->
+    let elmErrorParser   :: Value -> Parser ElmCompilerOutput = \v -> ElmError <$>  (parseJSON v :: Parser CompilerError)
+        otherErrorParser :: Value -> Parser ElmCompilerOutput = \v -> OtherError <$> (parseJSON v :: Parser GeneralError)
+    in elmErrorParser v <|> otherErrorParser v
 
 
 instance FromJSON MessageText where
