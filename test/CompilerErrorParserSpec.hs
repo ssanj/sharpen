@@ -16,7 +16,7 @@ import qualified Data.List.NonEmpty as N
 unit_decodeCompilerError :: Assertion
 unit_decodeCompilerError = do
     input <- getInput "resources/compiler-error-1.json"
-    let decodedE = decodeInput input :: Either String CompilerError
+    let decodedE = decodeCompilerError input :: Either String CompilerError
     either failWithError assertCompilerError decodedE
 
 

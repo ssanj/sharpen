@@ -202,8 +202,16 @@ defaultConfig :: Config
 defaultConfig = Config OneError FullDetail StatsOff
 
 
-decodeInput :: T.Text -> Either String CompilerError
-decodeInput content = eitherDecode (B.fromStrict $ T.encodeUtf8 content)
+decodeCompilerError :: T.Text -> Either String CompilerError
+decodeCompilerError = decodeInput
+
+
+decodeGeneralError :: T.Text -> Either String GeneralError
+decodeGeneralError = decodeInput
+
+
+decodeInput :: FromJSON a => T.Text -> Either String a
+decodeInput = eitherDecode . B.fromStrict . T.encodeUtf8
 
 
 -- SUPPORT FUNCTIONS --

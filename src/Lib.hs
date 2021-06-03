@@ -31,7 +31,7 @@ sharpen config = do
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
   else
-    let resultE = decodeInput content :: Either String CompilerError
+    let resultE = decodeCompilerError content :: Either String CompilerError
 
         errorIO :: String -> IO ()
         errorIO = T.putStrLn . ("Parsing error: " <>) . T.pack
