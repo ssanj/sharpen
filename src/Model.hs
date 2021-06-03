@@ -70,7 +70,7 @@ data GeneralError =
   GeneralError {
     generalerrorPath     :: T.Text
   , generalerrorTitle    :: T.Text
-  , generalerrorMessages :: N.NonEmpty Message
+  , generalerrorMessage  :: N.NonEmpty Message
   } deriving stock (Generic, Eq, Show)
 
 
