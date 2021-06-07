@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 076f8bf65ec9fd834027c4811d0210ba51003ba05c78cbe740d01ee58baa6fb9
+-- hash: eaaf67f44653b492008b4ac1ef1a14a379cc7a859c293b26635e77c6cf9c05e7
 
 name:           sharpen
 version:        0.2.0.0
@@ -30,7 +30,6 @@ library
       ColorMap
       Lib
       Model
-      Planets
   other-modules:
       Paths_sharpen
   hs-source-dirs:
