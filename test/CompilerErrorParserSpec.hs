@@ -62,9 +62,9 @@ assertGeneralError generalError =
   let path = "elm.json"
       title = "ERROR IN DEPENDENCIES"
       message1 = messageLine "It looks like the dependencies elm.json in were edited by hand (or by a 3rd\nparty tool) leaving them in an invalid state.\n\nTry to change them back to what they were before! It is much more reliable to\nadd dependencies with "
-      message2 = messageFormat "GREEN" "elm install"
+      message2 = messageFormatGeneralError "elm install"
       message3 = messageLine " or the dependency management tool in\n"
-      message4 = messageFormat "GREEN" "elm reactor"
+      message4 = messageFormatGeneralError "elm reactor"
       message5 = messageLine ".\n\nPlease ask for help on the community forums if you try those paths and are still\nhaving problems!"
       messages =
           message1 :|
@@ -82,15 +82,21 @@ messageLine :: T.Text ->  Message
 messageLine = MessageLine . MessageText
 
 
-messageFormat :: T.Text -> T.Text -> Message
-messageFormat color message = MessageFormatting $ MessageFormat False False (Just color) message
+messageFormatGeneralError :: T.Text -> Message
+messageFormatGeneralError message = MessageFormatting $ MessageFormat False False (Just "GREEN") message
+
+
+
+messageFormatError :: T.Text -> Message
+messageFormatError message = MessageFormatting $ MessageFormat False False (Just "RED") message
+
+
+messageFormatSuggestion :: T.Text -> Message
+messageFormatSuggestion message = MessageFormatting $ MessageFormat False False (Just "yellow") message
+
 
 messageFormatHint :: T.Text -> Message
 messageFormatHint message = MessageFormatting $ MessageFormat False True Nothing message
-
-
-messageFormatUnderline :: T.Text -> T.Text -> Message
-messageFormatUnderline color message = MessageFormatting $ MessageFormat False True (Just color) message
 
 
 assertCompilerError :: CompilerError -> Assertion
@@ -170,19 +176,19 @@ namingError1 =
   --     ]
   -- },
 
-  let message1  = MessageLine $ MessageText "I cannot find a `NoteSelection` type:\n\n293| choseWhichNotes : NoteSelection -> List SC.NoteFull\n                       "
-      message2  = MessageFormatting $ MessageFormat False False (Just "RED") "^^^^^^^^^^^^^"
-      message3  = MessageLine $ MessageText "\nThese names seem close though:\n\n    "
-      message4  = MessageFormatting $ MessageFormat False False (Just "yellow") "XNoteSelection"
-      message5  = MessageLine $ MessageText "\n    "
-      message6  = MessageFormatting $ MessageFormat False False (Just "yellow") "StorageAction"
-      message7  = MessageLine $ MessageText "\n    "
-      message8  = MessageFormatting $ MessageFormat False False (Just "yellow") "SC.NoteIdVersion"
-      message9  = MessageLine $ MessageText "\n    "
-      message10 = MessageFormatting $ MessageFormat False False (Just "yellow") "Dom.Element"
-      message11 = MessageLine $ MessageText "\n\n"
+  let message1  = messageLine "I cannot find a `NoteSelection` type:\n\n293| choseWhichNotes : NoteSelection -> List SC.NoteFull\n                       "
+      message2  = messageFormatError "^^^^^^^^^^^^^"
+      message3  = messageLine "\nThese names seem close though:\n\n    "
+      message4  = messageFormatSuggestion "XNoteSelection"
+      message5  = messageLine "\n    "
+      message6  = messageFormatSuggestion "StorageAction"
+      message7  = messageLine "\n    "
+      message8  = messageFormatSuggestion "SC.NoteIdVersion"
+      message9  = messageLine "\n    "
+      message10 = messageFormatSuggestion "Dom.Element"
+      message11 = messageLine "\n\n"
       message12 = messageFormatHint "Hint"
-      message13 = MessageLine $ MessageText ": Read <https://elm-lang.org/0.19.1/imports> to see how `import`\ndeclarations work in Elm."
+      message13 = messageLine ": Read <https://elm-lang.org/0.19.1/imports> to see how `import`\ndeclarations work in Elm."
       messages  =
           message1 :|
               [
@@ -273,15 +279,15 @@ namingError2 =
   -- }
 
   let message1  = messageLine "I cannot find a `NoteSelection` type:\n\n285| noteSelection  : Model -> NoteSelection\n                               "
-      message2  = messageFormat "RED" "^^^^^^^^^^^^^"
+      message2  = messageFormatError "^^^^^^^^^^^^^"
       message3  = messageLine "\nThese names seem close though:\n\n    "
-      message4  = messageFormat "yellow" "XNoteSelection"
+      message4  = messageFormatSuggestion "XNoteSelection"
       message5  = messageLine  "\n    "
-      message6  = messageFormat "yellow" "StorageAction"
+      message6  = messageFormatSuggestion "StorageAction"
       message7  = messageLine "\n    "
-      message8  = messageFormat "yellow" "SC.NoteIdVersion"
+      message8  = messageFormatSuggestion "SC.NoteIdVersion"
       message9  = messageLine "\n    "
-      message10 = messageFormat "yellow" "Dom.Element"
+      message10 = messageFormatSuggestion "Dom.Element"
       message11 = messageLine "\n\n"
       message12 = messageFormatHint  "Hint"
       message13 = messageLine ": Read <https://elm-lang.org/0.19.1/imports> to see how `import`\ndeclarations work in Elm."
