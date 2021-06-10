@@ -41,15 +41,23 @@ sharpen config = do
 
     in either errorIO successIO resultE
 
+-- TODO: Pull out compiler error and generic error handling into separate files
+-- TODO: Find a way to share common code
 
 simplePrinter :: RuntimeConfig -> ElmCompilerOutput -> IO ()
 simplePrinter rc elmCompilerOutput = do
   let
-    desc :: CompilerError -> N.NonEmpty ProblemsAtFileLocation
-    desc (CompilerError nonEmptyErrors _) = processErrors =<< nonEmptyErrors
+    compilerErrorToProblemsAtFileLocations :: CompilerError -> N.NonEmpty ProblemsAtFileLocation
+    compilerErrorToProblemsAtFileLocations (CompilerError nonEmptyErrors _) = processCompilerErrors =<< nonEmptyErrors
 
-    processErrors :: Error -> N.NonEmpty ProblemsAtFileLocation
-    processErrors (Error filePath _ problems) = problemsAtFileLocation filePath <$> problems
+    processCompilerErrors :: Error -> N.NonEmpty ProblemsAtFileLocation
+    processCompilerErrors (Error filePath _ problems) = problemsAtFileLocation filePath <$> problems
+
+    generalErrorToProblemsInFile ::  GeneralError -> GeneralProblemsInFile
+    generalErrorToProblemsInFile (GeneralError path title nonEmptyMessages) =
+      let problems = problemDescription <$> nonEmptyMessages
+      in GeneralProblemsInFile title path problems
+
 
     problemsAtFileLocation ::T.Text -> Problem -> ProblemsAtFileLocation
     problemsAtFileLocation filePath (Problem title (Region (LineAndColumn start end) _) messages) =
@@ -66,12 +74,24 @@ simplePrinter rc elmCompilerOutput = do
       in ProblemDescription formatting messageText
 
   case elmCompilerOutput of
-    ElmError compilerError  -> simpleErrorDescriptionInterpretter rc $ CompilerErrorDescription $ desc compilerError
-    OtherError generalError -> simpleGeneralErrorInterpreter rc generalError
+    ElmError compilerError  -> simpleErrorDescriptionInterpretter rc $ CompilerErrorDescription $ compilerErrorToProblemsAtFileLocations compilerError
+    OtherError generalError -> simpleGeneralErrorInterpreter rc $ generalErrorToProblemsInFile generalError
 
 
-simpleGeneralErrorInterpreter :: RuntimeConfig -> GeneralError  -> IO ()
-simpleGeneralErrorInterpreter RuntimeConfig { runtimeConfigConfig = config } generalError = undefined
+simpleGeneralErrorInterpreter :: RuntimeConfig -> GeneralProblemsInFile  -> IO ()
+simpleGeneralErrorInterpreter RuntimeConfig { runtimeConfigConfig = config } probsInFile =
+  do
+    border
+    renderGeneralErrorHeader config probsInFile
+    paragraph
+    traverse_  renderProblem $ generalProblemsInFilePathProblemDescriptions probsInFile
+    border
+
+
+renderGeneralErrorHeader :: Config -> GeneralProblemsInFile -> IO ()
+renderGeneralErrorHeader _ (GeneralProblemsInFile title path _) =
+  let heading  = "-- " <> title <> " ---------- " <> path
+  in withColourInline heading titleColor >> newLines 1
 
 
 simpleErrorDescriptionInterpretter :: RuntimeConfig -> CompilerErrorDescription ->  IO ()
@@ -95,6 +115,12 @@ filterByRequested OneError  = N.take 1
 
 newLines :: Int -> IO ()
 newLines n = traverse_ (const $ T.putStrLn "") [1..n]
+
+border ::  IO ()
+border = newLines 2
+
+paragraph ::  IO ()
+paragraph = newLines 1
 
 
 renderFileProblems :: ProblemsAtFileLocation -> IO ()

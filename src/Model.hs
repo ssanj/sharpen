@@ -164,10 +164,17 @@ data ProblemDescription = ProblemDescription [MessageFormatType] T.Text
 -- Problems in a single file and single location
 data ProblemsAtFileLocation =
   ProblemsAtFileLocation {
-    problemsAtFileLocationTitle :: T.Text
-  , problemsAtFileLocationFilePath :: T.Text
-  , problemsAtFileLocationFileCoords :: (Int, Int)
+    problemsAtFileLocationTitle               :: T.Text
+  , problemsAtFileLocationFilePath            :: T.Text
+  , problemsAtFileLocationFileCoords          :: (Int, Int)
   , problemsAtFileLocationProblemDescriptions :: N.NonEmpty ProblemDescription
+  }
+
+data GeneralProblemsInFile =
+  GeneralProblemsInFile {
+    generalProblemsInFileTitle                   :: T.Text
+  , generalProblemsInFilePath                    :: T.Text
+  , generalProblemsInFilePathProblemDescriptions :: N.NonEmpty ProblemDescription
   }
 
 
