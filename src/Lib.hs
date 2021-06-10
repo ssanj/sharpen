@@ -31,22 +31,22 @@ sharpen config = do
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
   else
-    let resultE = decodeCompilerError content :: Either String CompilerError
+    let resultE = decodeElmCompilerOutput content :: Either String ElmCompilerOutput
 
         errorIO :: String -> IO ()
         errorIO = T.putStrLn . ("Parsing error: " <>) . T.pack
 
-        successIO :: CompilerError -> IO ()
+        successIO :: ElmCompilerOutput -> IO ()
         successIO = simplePrinter runtimeConfig
 
     in either errorIO successIO resultE
 
 
-simplePrinter :: RuntimeConfig -> CompilerError -> IO ()
-simplePrinter rc (CompilerError nonEmptyErrors errorType) = do
+simplePrinter :: RuntimeConfig -> ElmCompilerOutput -> IO ()
+simplePrinter rc elmCompilerOutput = do
   let
-    desc :: N.NonEmpty ProblemsAtFileLocation
-    desc = processErrors =<< nonEmptyErrors
+    desc :: CompilerError -> N.NonEmpty ProblemsAtFileLocation
+    desc (CompilerError nonEmptyErrors _) = processErrors =<< nonEmptyErrors
 
     processErrors :: Error -> N.NonEmpty ProblemsAtFileLocation
     processErrors (Error filePath _ problems) = problemsAtFileLocation filePath <$> problems
@@ -65,7 +65,13 @@ simplePrinter rc (CompilerError nonEmptyErrors errorType) = do
             catMaybes [ boolToMaybe doBold BoldFormat, boolToMaybe doUnderline UnderlineFormat, ColourFormat  <$> (doColor >>= maybeColor colorNamesMap) ]
       in ProblemDescription formatting messageText
 
-  simpleErrorDescriptionInterpretter rc $ CompilerErrorDescription desc
+  case elmCompilerOutput of
+    ElmError compilerError  -> simpleErrorDescriptionInterpretter rc $ CompilerErrorDescription $ desc compilerError
+    OtherError generalError -> simpleGeneralErrorInterpreter rc generalError
+
+
+simpleGeneralErrorInterpreter :: RuntimeConfig -> GeneralError  -> IO ()
+simpleGeneralErrorInterpreter RuntimeConfig { runtimeConfigConfig = config } generalError = undefined
 
 
 simpleErrorDescriptionInterpretter :: RuntimeConfig -> CompilerErrorDescription ->  IO ()

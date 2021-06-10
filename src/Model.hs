@@ -202,6 +202,10 @@ defaultConfig :: Config
 defaultConfig = Config OneError FullDetail StatsOff
 
 
+decodeElmCompilerOutput :: T.Text -> Either String ElmCompilerOutput
+decodeElmCompilerOutput = decodeInput
+
+
 decodeCompilerError :: T.Text -> Either String CompilerError
 decodeCompilerError = decodeInput
 
