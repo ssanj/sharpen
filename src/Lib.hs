@@ -6,7 +6,9 @@ module Lib
     ( sharpen
     ) where
 
-import System.IO
+import System.IO hiding (FilePath)
+import Prelude hiding (FilePath)
+
 import Model
 import ColorMap
 
@@ -23,6 +25,7 @@ import qualified Data.Map.Strict      as M
 import qualified Data.List.NonEmpty   as N
 
 import Data.List.NonEmpty (NonEmpty(..), (<|))
+
 
 
 sharpen :: Config -> IO ()
@@ -51,18 +54,18 @@ simplePrinter rc elmCompilerOutput = do
     compilerErrorToProblemsAtFileLocations (CompilerError nonEmptyErrors _) = processCompilerErrors =<< nonEmptyErrors
 
     processCompilerErrors :: Error -> N.NonEmpty ProblemsAtFileLocation
-    processCompilerErrors (Error filePath _ problems) = problemsAtFileLocation filePath <$> problems
+    processCompilerErrors (Error filePath _ problems) = problemsAtFileLocation (FilePath filePath) <$> problems
 
     generalErrorToProblemsInFile ::  GeneralError -> GeneralProblemsInFile
     generalErrorToProblemsInFile (GeneralError path title nonEmptyMessages) =
       let problems = problemDescription <$> nonEmptyMessages
-      in GeneralProblemsInFile title path problems
+      in GeneralProblemsInFile (Title title) (FilePath path) problems
 
 
-    problemsAtFileLocation ::T.Text -> Problem -> ProblemsAtFileLocation
+    problemsAtFileLocation :: FilePath -> Problem -> ProblemsAtFileLocation
     problemsAtFileLocation filePath (Problem title (Region (LineAndColumn start end) _) messages) =
       let problemDescriptions :: N.NonEmpty ProblemDescription = fmap problemDescription messages
-      in ProblemsAtFileLocation title filePath (start, end) problemDescriptions
+      in ProblemsAtFileLocation (Title title) filePath (start, end) problemDescriptions
 
     -- Document how this record syntax works with `doBold`, `doUnderline` etc
     problemDescription ::  Message -> ProblemDescription
@@ -90,7 +93,7 @@ simpleGeneralErrorInterpreter RuntimeConfig { runtimeConfigConfig = config } pro
 
 renderGeneralErrorHeader :: Config -> GeneralProblemsInFile -> IO ()
 renderGeneralErrorHeader _ (GeneralProblemsInFile title path _) =
-  let heading  = "-- " <> title <> " ---------- " <> path
+  let heading  = "-- " <> (showt title) <> " ---------- " <> (showt path)
   in withColourInline heading titleColor >> newLines 1
 
 
@@ -134,7 +137,7 @@ renderFileProblems pfl@(ProblemsAtFileLocation title filePath (s, e) problems) =
 createTitleAndFile :: ProblemsAtFileLocation -> IO ()
 createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
   let coords = showt s <> ":" <> showt e
-      singleFileMessage = "-- " <> title <> " ---------- " <> filePath <> ":" <> coords
+      singleFileMessage = "-- " <> (showt title) <> " ---------- " <> (showt filePath) <> ":" <> coords
   in withColourInline singleFileMessage titleColor >> newLines 1
 
 

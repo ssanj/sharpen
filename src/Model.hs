@@ -9,6 +9,7 @@ import Data.Aeson hiding (Error)
 import Data.Aeson.Types (Parser)
 import GHC.Generics
 import System.Console.ANSI.Types
+import Prelude hiding (FilePath)
 
 import Data.Aeson.Casing (aesonPrefix, camelCase)
 import Control.Applicative ((<|>))
@@ -164,16 +165,20 @@ data ProblemDescription = ProblemDescription [MessageFormatType] T.Text
 -- Problems in a single file and single location
 data ProblemsAtFileLocation =
   ProblemsAtFileLocation {
-    problemsAtFileLocationTitle               :: T.Text
-  , problemsAtFileLocationFilePath            :: T.Text
+    problemsAtFileLocationTitle               :: Title
+  , problemsAtFileLocationFilePath            :: FilePath
   , problemsAtFileLocationFileCoords          :: (Int, Int)
   , problemsAtFileLocationProblemDescriptions :: N.NonEmpty ProblemDescription
   }
 
+newtype Title  = Title T.Text deriving (Eq, Show)
+
+newtype FilePath  = FilePath T.Text deriving (Eq, Show)
+
 data GeneralProblemsInFile =
   GeneralProblemsInFile {
-    generalProblemsInFileTitle                   :: T.Text
-  , generalProblemsInFilePath                    :: T.Text
+    generalProblemsInFileTitle                   :: Title
+  , generalProblemsInFilePath                    :: FilePath
   , generalProblemsInFilePathProblemDescriptions :: N.NonEmpty ProblemDescription
   }
 
