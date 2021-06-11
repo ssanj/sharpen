@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Lib
@@ -11,6 +10,7 @@ import Prelude hiding (FilePath)
 
 import Model
 import ColorMap
+import Theme
 
 import Data.List (find)
 import Data.Maybe (catMaybes)
@@ -25,7 +25,6 @@ import qualified Data.Map.Strict      as M
 import qualified Data.List.NonEmpty   as N
 
 import Data.List.NonEmpty (NonEmpty(..), (<|))
-
 
 
 sharpen :: Config -> IO ()
@@ -114,16 +113,6 @@ printNumberOfCompilationErrors errors =
 filterByRequested :: NumberOfErrors -> N.NonEmpty ProblemsAtFileLocation -> [ProblemsAtFileLocation]
 filterByRequested AllErrors = N.toList
 filterByRequested OneError  = N.take 1
-
-
-newLines :: Int -> IO ()
-newLines n = traverse_ (const $ T.putStrLn "") [1..n]
-
-border ::  IO ()
-border = newLines 2
-
-paragraph ::  IO ()
-paragraph = newLines 1
 
 
 renderFileProblems :: ProblemsAtFileLocation -> IO ()
