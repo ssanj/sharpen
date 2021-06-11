@@ -92,7 +92,7 @@ simpleGeneralErrorInterpreter RuntimeConfig { runtimeConfigConfig = config } pro
 
 renderGeneralErrorHeader :: Config -> GeneralProblemsInFile -> IO ()
 renderGeneralErrorHeader _ (GeneralProblemsInFile title path _) =
-  let heading  = "-- " <> (showt title) <> " ---------- " <> (showt path)
+  let heading  = "-- " <> showt title <> " ---------- " <> showt path
   in withColourInline heading titleColor >> newLines 1
 
 
@@ -126,7 +126,7 @@ renderFileProblems pfl@(ProblemsAtFileLocation title filePath (s, e) problems) =
 createTitleAndFile :: ProblemsAtFileLocation -> IO ()
 createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
   let coords = showt s <> ":" <> showt e
-      singleFileMessage = "-- " <> (showt title) <> " ---------- " <> (showt filePath) <> ":" <> coords
+      singleFileMessage = "-- " <> showt title <> " ---------- " <> showt filePath <> ":" <> coords
   in withColourInline singleFileMessage titleColor >> newLines 1
 
 
