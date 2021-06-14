@@ -46,3 +46,28 @@ withColourInline text color = do
   setSGR [SetColor Foreground Dull color]
   T.putStr text
   resetAnsi
+
+
+renderProblem :: ProblemDescription -> IO ()
+renderProblem (ProblemDescription formatting message) =
+  let formattingApplied = traverse_ renderFormatting formatting
+  in formattingApplied >> T.putStr message >> resetAnsi
+
+renderFileProblems :: ProblemsAtFileLocation -> IO ()
+renderFileProblems pfl@(ProblemsAtFileLocation title filePath (s, e) problems) =
+  do
+    createTitleAndFile pfl
+    newLines 1
+    traverse_  renderProblem problems
+
+
+createTitleAndFile :: ProblemsAtFileLocation -> IO ()
+createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
+  let coords = showt s <> ":" <> showt e
+      singleFileMessage = "-- " <> showt title <> " ---------- " <> showt filePath <> ":" <> coords
+  in withColourInline singleFileMessage titleColor >> newLines 1
+
+
+printNumberOfCompilationErrors :: Int -> IO ()
+printNumberOfCompilationErrors errors =
+  T.putStr "Compilation errors: " >> withColourInline (showt errors) errorColor

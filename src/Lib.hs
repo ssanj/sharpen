@@ -76,7 +76,7 @@ simplePrinter rc elmCompilerOutput = do
       in ProblemDescription formatting messageText
 
   case elmCompilerOutput of
-    ElmError compilerError  -> simpleErrorDescriptionInterpretter rc $ CompilerErrorDescription $ compilerErrorToProblemsAtFileLocations compilerError
+    ElmError compilerError  -> simpleErrorDescriptionInterpreter rc $ CompilerErrorDescription $ compilerErrorToProblemsAtFileLocations compilerError
     OtherError generalError -> simpleGeneralErrorInterpreter rc $ generalErrorToProblemsInFile generalError
 
 
@@ -96,8 +96,8 @@ renderGeneralErrorHeader _ (GeneralProblemsInFile title path _) =
   in withColourInline heading titleColor >> newLines 1
 
 
-simpleErrorDescriptionInterpretter :: RuntimeConfig -> CompilerErrorDescription ->  IO ()
-simpleErrorDescriptionInterpretter RuntimeConfig { runtimeConfigConfig = config }  (CompilerErrorDescription errorDescriptions) = do
+simpleErrorDescriptionInterpreter :: RuntimeConfig -> CompilerErrorDescription ->  IO ()
+simpleErrorDescriptionInterpreter RuntimeConfig { runtimeConfigConfig = config }  (CompilerErrorDescription errorDescriptions) = do
   traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested (configNumErrors config) errorDescriptions)
   newLines 2
   when (configStats config == StatsOn) $ do
@@ -105,32 +105,8 @@ simpleErrorDescriptionInterpretter RuntimeConfig { runtimeConfigConfig = config 
     newLines 2
 
 
-printNumberOfCompilationErrors :: Int -> IO ()
-printNumberOfCompilationErrors errors =
-  T.putStr "Compilation errors: " >> withColourInline (showt errors) errorColor
-
 
 filterByRequested :: NumberOfErrors -> N.NonEmpty ProblemsAtFileLocation -> [ProblemsAtFileLocation]
 filterByRequested AllErrors = N.toList
 filterByRequested OneError  = N.take 1
 
-
-renderFileProblems :: ProblemsAtFileLocation -> IO ()
-renderFileProblems pfl@(ProblemsAtFileLocation title filePath (s, e) problems) =
-  do
-    createTitleAndFile pfl
-    newLines 1
-    traverse_  renderProblem problems
-
-
-createTitleAndFile :: ProblemsAtFileLocation -> IO ()
-createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
-  let coords = showt s <> ":" <> showt e
-      singleFileMessage = "-- " <> showt title <> " ---------- " <> showt filePath <> ":" <> coords
-  in withColourInline singleFileMessage titleColor >> newLines 1
-
-
-renderProblem :: ProblemDescription -> IO ()
-renderProblem (ProblemDescription formatting message) =
-  let formattingApplied = traverse_ renderFormatting formatting
-  in formattingApplied >> T.putStr message >> resetAnsi
