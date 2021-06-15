@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a0fc7da092c40b2ba25d76f57ffc15d62bd10e207ec029004d6d9fe8c8737cf5
+-- hash: 9978c1feeb433162d64a367e090b4c0c6196bc93af603f61e18d963a39eb0bd6
 
 name:           sharpen
 version:        0.2.0.0
@@ -28,8 +28,11 @@ source-repository head
 library
   exposed-modules:
       ColorMap
+      DependencyError
+      ElmCompilerError
       Lib
       Model
+      RenderModel
       Theme
   other-modules:
       Paths_sharpen

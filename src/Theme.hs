@@ -4,12 +4,15 @@ module Theme where
 
 import System.Console.ANSI
 import Model
+import RenderModel
 
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
 
 import Data.Foldable (traverse_)
 
+
+-- TODO: Make this into a replacable theme
 
 titleColor :: Color
 titleColor = Cyan
@@ -66,6 +69,12 @@ createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
   let coords = showt s <> ":" <> showt e
       singleFileMessage = "-- " <> showt title <> " ---------- " <> showt filePath <> ":" <> coords
   in withColourInline singleFileMessage titleColor >> newLines 1
+
+
+renderGeneralErrorHeader :: GeneralProblemsInFile -> IO ()
+renderGeneralErrorHeader (GeneralProblemsInFile title path _) =
+  let heading  = "-- " <> showt title <> " ---------- " <> showt path
+  in withColourInline heading titleColor >> newLines 1
 
 
 printNumberOfCompilationErrors :: Int -> IO ()
