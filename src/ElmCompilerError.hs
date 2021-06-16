@@ -54,20 +54,6 @@ problemDescription colorNamesMap (MessageFormatting MessageFormat {messageformat
   in ProblemDescription formatting messageText
 
 
-renderStats :: Stats -> Int -> IO ()
-renderStats stats numberOfErrors =
-  when (stats == StatsOn) $ do
-    printNumberOfCompilationErrors numberOfErrors
-    newLines 2
-
-
--- TODO: move this to Theme
-renderCompilerErrorDescription :: CompilerErrorDescription ->  IO ()
-renderCompilerErrorDescription (CompilerErrorDescription errorDescriptions) = do
-  traverse_ (\ed -> newLines 2 >> renderFileProblems ed) errorDescriptions
-  newLines 2
-
-
 filterByRequested :: NumberOfErrors -> N.NonEmpty ProblemsAtFileLocation ->  N.NonEmpty ProblemsAtFileLocation
 filterByRequested AllErrors = id
 filterByRequested OneError  = pure . N.head

@@ -10,6 +10,7 @@ import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
 
 import Data.Foldable (traverse_)
+import Control.Monad (when)
 
 
 -- TODO: Make this into a replacable theme
@@ -80,3 +81,16 @@ renderGeneralErrorHeader (GeneralProblemsInFile title path _) =
 printNumberOfCompilationErrors :: Int -> IO ()
 printNumberOfCompilationErrors errors =
   T.putStr "Compilation errors: " >> withColourInline (showt errors) errorColor
+
+
+renderStats :: Stats -> Int -> IO ()
+renderStats stats numberOfErrors =
+  when (stats == StatsOn) $ do
+    printNumberOfCompilationErrors numberOfErrors
+    newLines 2
+
+
+renderCompilerErrorDescription :: CompilerErrorDescription ->  IO ()
+renderCompilerErrorDescription (CompilerErrorDescription errorDescriptions) = do
+  traverse_ (\ed -> newLines 2 >> renderFileProblems ed) errorDescriptions
+  newLines 2
