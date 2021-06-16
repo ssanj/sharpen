@@ -11,15 +11,20 @@ import Data.Maybe (catMaybes)
 import Data.Foldable (traverse_)
 import Control.Monad (when)
 
-import qualified Data.List.NonEmpty   as N
+import qualified Data.List.NonEmpty as N
 
 processError :: RuntimeConfig -> CompilerError -> IO ()
 processError RuntimeConfig { runtimeConfigColorMap = colorMap, runtimeConfigConfig = config } compilerError =
-  let stats            = configStats config
-      numErrors        = configNumErrors config
-      problems         = compilerErrorToProblemsAtFileLocations colorMap compilerError
-      errorDescription = CompilerErrorDescription problems
-  in renderCompilerErrorDescription stats numErrors errorDescription
+  let stats                = configStats config
+      numErrors            = configNumErrors config
+      problems             = compilerErrorToProblemsAtFileLocations colorMap compilerError
+      problemsToDisplay    = filterByRequested numErrors problems
+      numProblemsDisplayed = N.length problemsToDisplay
+      compilerErrorDesc    = CompilerErrorDescription problemsToDisplay
+
+      renderEnabledStats   = renderStats stats numProblemsDisplayed
+      renderCompilerErrors = renderCompilerErrorDescription compilerErrorDesc
+  in renderCompilerErrors >> renderEnabledStats
 
 
 compilerErrorToProblemsAtFileLocations :: ColorMap -> CompilerError -> N.NonEmpty ProblemsAtFileLocation
@@ -49,17 +54,21 @@ problemDescription colorNamesMap (MessageFormatting MessageFormat {messageformat
   in ProblemDescription formatting messageText
 
 
--- TODO: move this to Theme
-renderCompilerErrorDescription :: Stats -> NumberOfErrors -> CompilerErrorDescription ->  IO ()
-renderCompilerErrorDescription stats numErrors (CompilerErrorDescription errorDescriptions) = do
-  traverse_ (\ed -> newLines 2 >> renderFileProblems ed) (filterByRequested numErrors errorDescriptions)
-  newLines 2
+renderStats :: Stats -> Int -> IO ()
+renderStats stats numberOfErrors =
   when (stats == StatsOn) $ do
-    printNumberOfCompilationErrors (N.length errorDescriptions)
+    printNumberOfCompilationErrors numberOfErrors
     newLines 2
 
 
-filterByRequested :: NumberOfErrors -> N.NonEmpty ProblemsAtFileLocation -> [ProblemsAtFileLocation]
-filterByRequested AllErrors = N.toList
-filterByRequested OneError  = N.take 1
+-- TODO: move this to Theme
+renderCompilerErrorDescription :: CompilerErrorDescription ->  IO ()
+renderCompilerErrorDescription (CompilerErrorDescription errorDescriptions) = do
+  traverse_ (\ed -> newLines 2 >> renderFileProblems ed) errorDescriptions
+  newLines 2
+
+
+filterByRequested :: NumberOfErrors -> N.NonEmpty ProblemsAtFileLocation ->  N.NonEmpty ProblemsAtFileLocation
+filterByRequested AllErrors = id
+filterByRequested OneError  = pure . N.head
 
