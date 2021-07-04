@@ -23,12 +23,11 @@ import qualified Data.Text.IO         as T
 import qualified Data.Text.Encoding   as T
 import qualified Data.Map.Strict      as M
 import qualified Data.List.NonEmpty   as N
-import DependencyError                as DependencyError
-import ElmCompilerError               as ElmCompilerError
+import DependencyError                as DE
+import ElmCompilerError               as CE
 
 import Data.List.NonEmpty (NonEmpty(..), (<|))
 
--- TODO: Remove unused imports
 sharpen :: Config -> IO ()
 sharpen config = do
   let runtimeConfig = RuntimeConfig config allColorNamesMap
@@ -49,7 +48,7 @@ sharpen config = do
 simplePrinter :: RuntimeConfig -> ElmCompilerOutput -> IO ()
 simplePrinter rc elmCompilerOutput =
   case elmCompilerOutput of
-    ElmError compilerError  -> ElmCompilerError.processError rc compilerError
-    OtherError generalError -> DependencyError.processError rc generalError
+    ElmError compilerError  -> CE.processError rc compilerError
+    OtherError generalError -> DE.processError rc generalError
 
 
