@@ -13,7 +13,7 @@ import Data.Foldable (traverse_)
 import Control.Monad (when)
 
 
--- TODO: Make this into a replacable theme
+-- TODO: Make this into a replaceable theme
 
 titleColor :: Color
 titleColor = Cyan
@@ -94,3 +94,13 @@ renderCompilerErrorDescription :: CompilerErrorDescription ->  IO ()
 renderCompilerErrorDescription (CompilerErrorDescription errorDescriptions) = do
   traverse_ (\ed -> newLines 2 >> renderFileProblems ed) errorDescriptions
   newLines 2
+
+
+renderGeneralProblemsInFile :: GeneralProblemsInFile  -> IO ()
+renderGeneralProblemsInFile probsInFile =
+  do
+    border
+    renderGeneralErrorHeader probsInFile
+    paragraph
+    traverse_  renderProblem $ generalProblemsInFilePathProblemDescriptions probsInFile
+    border

@@ -28,14 +28,3 @@ problemDescription colorNamesMap (MessageFormatting MessageFormat {messageformat
           , ColourFormat  <$> (doColor >>= maybeColor colorNamesMap)
           ]
   in ProblemDescription formatting messageText
-
-
--- TODO: move this to Theme
-renderGeneralProblemsInFile :: GeneralProblemsInFile  -> IO ()
-renderGeneralProblemsInFile probsInFile =
-  do
-    border
-    renderGeneralErrorHeader probsInFile
-    paragraph
-    traverse_  renderProblem $ generalProblemsInFilePathProblemDescriptions probsInFile
-    border

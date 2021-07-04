@@ -28,7 +28,7 @@ processError RuntimeConfig { runtimeConfigColorMap = colorMap, runtimeConfigConf
         let problemDescriptions :: N.NonEmpty ProblemDescription = fmap problemDescription messages
         in ProblemsAtFileLocation (Title title) filePath (start, end) problemDescriptions
 
-
+      -- possibly remove dependency on colorMap and describe the color here (eg. Error, Warning etc)
       problemDescription ::  Message -> ProblemDescription
       problemDescription (MessageLine (MessageText messageText)) = ProblemDescription [] messageText
       problemDescription (MessageFormatting MessageFormat {messageformatBold = doBold, messageformatUnderline = doUnderline, messageformatColor = doColor, messageformatString = messageText}) =
