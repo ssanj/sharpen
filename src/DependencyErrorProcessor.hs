@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module DependencyError (processError) where
+module DependencyErrorProcessor (processError) where
 
 import Model
 import RenderModel
@@ -10,8 +10,8 @@ import ColorMap (maybeColor)
 import Data.Maybe (catMaybes)
 import Data.Foldable (traverse_)
 
-processError :: RuntimeConfig -> GeneralError -> IO ()
-processError RuntimeConfig { runtimeConfigColorMap = colorMap } (GeneralError path title nonEmptyMessages) =
+processError :: RuntimeConfig -> DependencyError -> IO ()
+processError RuntimeConfig { runtimeConfigColorMap = colorMap } (DependencyError path title nonEmptyMessages) =
   let problems = (problemDescription colorMap) <$> nonEmptyMessages
       genProblemsInFile = GeneralProblemsInFile (Title title) (FilePath path) problems
   in renderGeneralProblemsInFile genProblemsInFile

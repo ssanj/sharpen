@@ -23,7 +23,7 @@ import qualified Data.Text.IO         as T
 import qualified Data.Text.Encoding   as T
 import qualified Data.Map.Strict      as M
 import qualified Data.List.NonEmpty   as N
-import DependencyError                as DE
+import DependencyErrorProcessor       as DEP
 import ElmCompilerError               as CE
 
 import Data.List.NonEmpty (NonEmpty(..), (<|))
@@ -49,6 +49,6 @@ simplePrinter :: RuntimeConfig -> ElmCompilerOutput -> IO ()
 simplePrinter rc elmCompilerOutput =
   case elmCompilerOutput of
     ElmError compilerError  -> CE.processError rc compilerError
-    OtherError generalError -> DE.processError rc generalError
+    OtherError generalError -> DEP.processError rc generalError
 
 

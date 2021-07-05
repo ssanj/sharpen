@@ -20,11 +20,11 @@ unit_decodeCompilerError = do
   either failWithError assertCompilerError decodedE
 
 
-unit_decodeGeneralError :: Assertion
-unit_decodeGeneralError = do
+unit_decodeDependencyError :: Assertion
+unit_decodeDependencyError = do
   input <- getInput "resources/dependency-error.json"
-  let decodedE = decodeGeneralError input
-  either failWithError assertGeneralError decodedE
+  let decodedE = decodeDependencyError input
+  either failWithError assertDependencyError decodedE
 
 
 failWithError :: String -> Assertion
@@ -33,8 +33,8 @@ failWithError e =
     in assertFailure ("Could not decode input: " <> errorMessage)
 
 
-assertGeneralError :: GeneralError -> Assertion
-assertGeneralError generalError =
+assertDependencyError :: DependencyError -> Assertion
+assertDependencyError generalError =
 
   -- {
   --     "type": "error",
@@ -74,7 +74,7 @@ assertGeneralError generalError =
               , message4
               , message5
               ]
-      expected = GeneralError path title messages
+      expected = DependencyError path title messages
   in generalError @?= expected
 
 

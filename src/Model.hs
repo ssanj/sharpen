@@ -67,14 +67,14 @@ data Error =
 
 
 data ElmCompilerOutput = ElmError CompilerError
-                       | OtherError GeneralError deriving stock (Generic, Eq, Show)
+                       | OtherError DependencyError deriving stock (Generic, Eq, Show)
 
 
-data GeneralError =
-  GeneralError {
-    generalerrorPath     :: T.Text
-  , generalerrorTitle    :: T.Text
-  , generalerrorMessage  :: N.NonEmpty Message
+data DependencyError =
+  DependencyError {
+    dependencyerrorPath     :: T.Text
+  , dependencyerrorTitle    :: T.Text
+  , dependencyerrorMessage  :: N.NonEmpty Message
   } deriving stock (Generic, Eq, Show)
 
 
@@ -115,7 +115,7 @@ instance FromJSON Message where
 instance FromJSON ElmCompilerOutput where
   parseJSON = \v ->
     let elmErrorParser   :: Value -> Parser ElmCompilerOutput = \v -> ElmError <$>  (parseJSON v :: Parser CompilerError)
-        otherErrorParser :: Value -> Parser ElmCompilerOutput = \v -> OtherError <$> (parseJSON v :: Parser GeneralError)
+        otherErrorParser :: Value -> Parser ElmCompilerOutput = \v -> OtherError <$> (parseJSON v :: Parser DependencyError)
     in elmErrorParser v <|> otherErrorParser v
 
 
@@ -152,7 +152,7 @@ instance FromJSON CompilerError where
    parseJSON = genericParseJSON jsonOptions
 
 
-instance FromJSON GeneralError where
+instance FromJSON DependencyError where
    parseJSON = genericParseJSON jsonOptions
 
 
@@ -200,8 +200,8 @@ decodeCompilerError :: T.Text -> Either String CompilerError
 decodeCompilerError = decodeInput
 
 
-decodeGeneralError :: T.Text -> Either String GeneralError
-decodeGeneralError = decodeInput
+decodeDependencyError :: T.Text -> Either String DependencyError
+decodeDependencyError = decodeInput
 
 
 decodeInput :: FromJSON a => T.Text -> Either String a
@@ -211,7 +211,7 @@ decodeInput = eitherDecode . B.fromStrict . T.encodeUtf8
 
 -- SUPPORT FUNCTIONS --
 
-
+-- Move to custom prelude
 showt :: Show a => a -> T.Text
 showt = T.pack . show
 
