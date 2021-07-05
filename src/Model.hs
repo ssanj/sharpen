@@ -154,13 +154,20 @@ instance FromJSON DependencyError where
    parseJSON = genericParseJSON jsonOptions
 
 
-data MessageFormatType = ColourFormat Color
-                       | ColorFormat2 ColorType
+data MessageFormatType = ColorFormat ColorType
                        | BoldFormat
                        | UnderlineFormat
 
 
-data ColorType = ErrorColor | SuggestionColor | HintColor
+data ColorType = CompilerErrorColor | CompilerSuggestionColor | DependencyErrorColor
+
+colorToMaybeColorType :: T.Text -> Maybe ColorType
+colorToMaybeColorType colorText =
+  case T.toUpper colorText of
+    "RED"    -> Just CompilerErrorColor
+    "YELLOW" -> Just CompilerSuggestionColor
+    "GREEN"  -> Just DependencyErrorColor
+    _        -> Nothing
 
 -- TODO: Rename
 

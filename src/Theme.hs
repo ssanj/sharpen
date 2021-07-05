@@ -15,10 +15,10 @@ import Control.Monad (when)
 
 -- TODO: Make this into a replaceable theme
 
-colorTypeToColor :: ColorType -> Maybe Color
-colorTypeToColor  ErrorColor      = Just errorColor
-colorTypeToColor  SuggestionColor = Just suggestionColor
-colorTypeToColor  HintColor       = Nothing
+colorTypeToColor :: ColorType -> Color
+colorTypeToColor  CompilerErrorColor      = errorColor
+colorTypeToColor  CompilerSuggestionColor = suggestionColor
+colorTypeToColor  DependencyErrorColor    = dependencyErrorColor
 
 
 titleColor :: Color
@@ -31,6 +31,10 @@ errorColor = Red
 
 suggestionColor :: Color
 suggestionColor = Yellow
+
+
+dependencyErrorColor :: Color
+dependencyErrorColor = Green
 
 
 newLines :: Int -> IO ()
@@ -46,16 +50,12 @@ paragraph = newLines 1
 
 
 renderFormatting :: MessageFormatType -> IO ()
-renderFormatting (ColourFormat color)     = setSGR [SetColor Foreground Dull color]
-renderFormatting (ColorFormat2 colorType) =
+renderFormatting (ColorFormat colorType) =
   let colorsToSGR :: Color -> [SGR]
       colorsToSGR color = [ SetColor Foreground Dull color]
 
-      noColors :: [SGR]
-      noColors = []
-
       sgrColors :: [SGR]
-      sgrColors = maybe noColors colorsToSGR (colorTypeToColor colorType)
+      sgrColors = colorsToSGR $ colorTypeToColor colorType
 
   in setSGR sgrColors
 

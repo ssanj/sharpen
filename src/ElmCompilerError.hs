@@ -6,13 +6,12 @@ import Prelude hiding (FilePath)
 import Model
 import RenderModel
 import Theme
-import ColorMap (maybeColor)
 import Data.Maybe (catMaybes)
 
 import qualified Data.List.NonEmpty as N
 
 processError :: RuntimeConfig -> CompilerError -> IO ()
-processError RuntimeConfig { runtimeConfigColorMap = colorMap, runtimeConfigConfig = config } compilerError =
+processError RuntimeConfig { runtimeConfigConfig = config } compilerError =
   let compilerErrorToProblemsAtFileLocations :: CompilerError -> N.NonEmpty ProblemsAtFileLocation
       compilerErrorToProblemsAtFileLocations (CompilerError nonEmptyErrors _) = processCompilerErrors =<< nonEmptyErrors
 
@@ -35,7 +34,7 @@ processError RuntimeConfig { runtimeConfigColorMap = colorMap, runtimeConfigConf
                 [
                   boolToMaybe doBold BoldFormat
                 , boolToMaybe doUnderline UnderlineFormat
-                , ColourFormat  <$> (doColor >>= maybeColor colorMap)
+                , ColorFormat  <$> (doColor >>= colorToMaybeColorType)
                 ]
         in ProblemDescription formatting messageText
 
