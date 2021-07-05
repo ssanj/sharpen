@@ -159,7 +159,7 @@ data MessageFormatType = ColorFormat ColorType
                        | UnderlineFormat
 
 
-data ColorType = CompilerErrorColor | CompilerSuggestionColor | DependencyErrorColor
+data ColorType = CompilerErrorColor | CompilerSuggestionColor | DependencyErrorColor deriving stock (Eq, Show)
 
 colorToMaybeColorType :: T.Text -> Maybe ColorType
 colorToMaybeColorType colorText =
