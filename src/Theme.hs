@@ -28,6 +28,7 @@ titleColor = Cyan
 errorColor :: Color
 errorColor = Red
 
+
 suggestionColor :: Color
 suggestionColor = Yellow
 
@@ -45,10 +46,21 @@ paragraph = newLines 1
 
 
 renderFormatting :: MessageFormatType -> IO ()
-renderFormatting (ColourFormat color) = setSGR [SetColor Foreground Dull color]
-renderFormatting (ColorFormat2 _)     = undefined
-renderFormatting UnderlineFormat      = setSGR [SetUnderlining SingleUnderline]
-renderFormatting BoldFormat           = setSGR [SetConsoleIntensity BoldIntensity]
+renderFormatting (ColourFormat color)     = setSGR [SetColor Foreground Dull color]
+renderFormatting (ColorFormat2 colorType) =
+  let colorsToSGR :: Color -> [SGR]
+      colorsToSGR color = [ SetColor Foreground Dull color]
+
+      noColors :: [SGR]
+      noColors = []
+
+      sgrColors :: [SGR]
+      sgrColors = maybe noColors colorsToSGR (colorTypeToColor colorType)
+
+  in setSGR sgrColors
+
+renderFormatting UnderlineFormat          = setSGR [SetUnderlining SingleUnderline]
+renderFormatting BoldFormat               = setSGR [SetConsoleIntensity BoldIntensity]
 
 
 resetAnsi :: IO ()
@@ -66,6 +78,7 @@ renderProblem :: ProblemDescription -> IO ()
 renderProblem (ProblemDescription formatting message) =
   let formattingApplied = traverse_ renderFormatting formatting
   in formattingApplied >> T.putStr message >> resetAnsi
+
 
 renderFileProblems :: ProblemsAtFileLocation -> IO ()
 renderFileProblems pfl@(ProblemsAtFileLocation _ _ _ problems) =

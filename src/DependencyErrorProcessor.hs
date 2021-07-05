@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module DependencyErrorProcessor (processError) where
 
 import Model
@@ -11,7 +9,7 @@ import Data.Maybe (catMaybes)
 
 processError :: RuntimeConfig -> DependencyError -> IO ()
 processError RuntimeConfig { runtimeConfigColorMap = colorMap } (DependencyError path title nonEmptyMessages) =
-  let problems = (problemDescription colorMap) <$> nonEmptyMessages
+  let problems = problemDescription colorMap <$> nonEmptyMessages
       genProblemsInFile = GeneralProblemsInFile (Title title) (FilePath path) problems
   in renderGeneralProblemsInFile genProblemsInFile
 
