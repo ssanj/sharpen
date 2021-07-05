@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: daa368c6cec169a87fbec5e155fe119ef5b56122c3bde5a4c62f40b8306210b5
+-- hash: ff69e5b18c83a177a4d8c1025e170133e9b2d0cae9113e44d9071149d0a363a4
 
 name:           sharpen
 version:        0.2.0.0
@@ -38,6 +38,7 @@ library
       Paths_sharpen
   hs-source-dirs:
       src
+  ghc-options: -Werror -Weverything -fprint-potential-instances -fprint-expanded-synonyms -fno-warn-missing-import-lists -fno-warn-all-missed-specialisations -Wno-implicit-prelude -Wno-unsafe -Wno-safe -Wno-type-defaults -Wno-missing-export-lists
   build-depends:
       aeson
     , aeson-casing
@@ -70,7 +71,7 @@ test-suite sharpen-test
       Paths_sharpen
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -Werror -Weverything -Wno-unsafe -Wno-safe -Wno-implicit-prelude -Wno-missing-import-lists -Wno-missing-export-lists -Wno-missing-local-signatures
   build-depends:
       base >=4.7 && <5
     , hedgehog

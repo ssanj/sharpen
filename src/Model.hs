@@ -13,11 +13,9 @@ import Prelude hiding (FilePath)
 
 import Data.Aeson.Casing (aesonPrefix, camelCase)
 import Control.Applicative ((<|>))
-import Data.Maybe (catMaybes)
 
 import qualified Data.ByteString.Lazy as B
 import qualified Data.Text            as T
-import qualified Data.Text.IO         as T
 import qualified Data.Text.Encoding   as T
 import qualified Data.List.NonEmpty   as N
 import qualified Data.Map.Strict      as M
@@ -106,17 +104,17 @@ jsonOptions = aesonPrefix camelCase
 
 
 instance FromJSON Message where
-  parseJSON = \v ->
+  parseJSON = \jsonValue ->
     let messageLineParser       :: Value -> Parser Message = \v -> fmap MessageLine (parseJSON v :: Parser MessageText)
         messageFormattingParser :: Value -> Parser Message = \v -> fmap MessageFormatting (parseJSON v :: Parser MessageFormat)
-    in messageLineParser v <|> messageFormattingParser v
+    in messageLineParser jsonValue <|> messageFormattingParser jsonValue
 
 
 instance FromJSON ElmCompilerOutput where
-  parseJSON = \v ->
+  parseJSON = \jsonValue ->
     let elmErrorParser   :: Value -> Parser ElmCompilerOutput = \v -> ElmError <$>  (parseJSON v :: Parser CompilerError)
         otherErrorParser :: Value -> Parser ElmCompilerOutput = \v -> OtherError <$> (parseJSON v :: Parser DependencyError)
-    in elmErrorParser v <|> otherErrorParser v
+    in elmErrorParser jsonValue <|> otherErrorParser jsonValue
 
 
 instance FromJSON MessageText where
@@ -157,9 +155,12 @@ instance FromJSON DependencyError where
 
 
 data MessageFormatType = ColourFormat Color
+                       | ColorFormat2 ColorType
                        | BoldFormat
                        | UnderlineFormat
 
+
+data ColorType = ErrorColor | SuggestionColor | HintColor
 
 -- TODO: Rename
 

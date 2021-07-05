@@ -10,23 +10,11 @@ import Prelude hiding (FilePath)
 
 import Model
 import ColorMap
-import Theme
-
-
-import Data.List (find)
-import Data.Foldable (traverse_)
-import Data.Aeson (eitherDecode)
-import Control.Monad (when, join)
 
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
-import qualified Data.Text.Encoding   as T
-import qualified Data.Map.Strict      as M
-import qualified Data.List.NonEmpty   as N
 import DependencyErrorProcessor       as DEP
 import ElmCompilerError               as CE
-
-import Data.List.NonEmpty (NonEmpty(..), (<|))
 
 sharpen :: Config -> IO ()
 sharpen config = do

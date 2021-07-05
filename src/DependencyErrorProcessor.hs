@@ -8,7 +8,6 @@ import Theme
 
 import ColorMap (maybeColor)
 import Data.Maybe (catMaybes)
-import Data.Foldable (traverse_)
 
 processError :: RuntimeConfig -> DependencyError -> IO ()
 processError RuntimeConfig { runtimeConfigColorMap = colorMap } (DependencyError path title nonEmptyMessages) =

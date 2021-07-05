@@ -15,12 +15,21 @@ import Control.Monad (when)
 
 -- TODO: Make this into a replaceable theme
 
+colorTypeToColor :: ColorType -> Maybe Color
+colorTypeToColor  ErrorColor      = Just errorColor
+colorTypeToColor  SuggestionColor = Just suggestionColor
+colorTypeToColor  HintColor       = Nothing
+
+
 titleColor :: Color
 titleColor = Cyan
 
 
 errorColor :: Color
 errorColor = Red
+
+suggestionColor :: Color
+suggestionColor = Yellow
 
 
 newLines :: Int -> IO ()
@@ -37,6 +46,7 @@ paragraph = newLines 1
 
 renderFormatting :: MessageFormatType -> IO ()
 renderFormatting (ColourFormat color) = setSGR [SetColor Foreground Dull color]
+renderFormatting (ColorFormat2 _)     = undefined
 renderFormatting UnderlineFormat      = setSGR [SetUnderlining SingleUnderline]
 renderFormatting BoldFormat           = setSGR [SetConsoleIntensity BoldIntensity]
 
@@ -58,7 +68,7 @@ renderProblem (ProblemDescription formatting message) =
   in formattingApplied >> T.putStr message >> resetAnsi
 
 renderFileProblems :: ProblemsAtFileLocation -> IO ()
-renderFileProblems pfl@(ProblemsAtFileLocation title filePath (s, e) problems) =
+renderFileProblems pfl@(ProblemsAtFileLocation _ _ _ problems) =
   do
     createTitleAndFile pfl
     newLines 1

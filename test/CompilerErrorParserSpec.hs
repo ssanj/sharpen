@@ -59,8 +59,9 @@ assertDependencyError generalError =
   --         ".\n\nPlease ask for help on the community forums if you try those paths and are still\nhaving problems!"
   --     ]
   -- }
-  let path = "elm.json"
-      title = "ERROR IN DEPENDENCIES"
+  let path  = "elm.json" :: T.Text
+      title = "ERROR IN DEPENDENCIES" :: T.Text
+
       message1 = messageLine "It looks like the dependencies elm.json in were edited by hand (or by a 3rd\nparty tool) leaving them in an invalid state.\n\nTry to change them back to what they were before! It is much more reliable to\nadd dependencies with "
       message2 = messageFormatGeneralError "elm install"
       message3 = messageLine " or the dependency management tool in\n"
@@ -206,11 +207,11 @@ namingError1 =
               , message13
               ]
 
-      regionStart = LineAndColumn 293 19
-      regionEnd   = LineAndColumn 293 32
-      region      = Region regionStart regionEnd
+      _regionStart = LineAndColumn 293 19
+      _regionEnd   = LineAndColumn 293 32
+      _region      = Region _regionStart _regionEnd
 
-  in Problem "NAMING ERROR" region messages
+  in Problem "NAMING ERROR" _region messages
 
 namingError2 :: Problem
 namingError2 =
@@ -308,8 +309,8 @@ namingError2 =
           , message13
           ]
 
-      regionStart = LineAndColumn 285 27
-      regionEnd   = LineAndColumn 285 40
-      region      = Region regionStart regionEnd
+      _regionStart = LineAndColumn 285 27
+      _regionEnd   = LineAndColumn 285 40
+      _region      = Region _regionStart _regionEnd
 
-  in Problem "NAMING ERROR" region messages
+  in Problem "NAMING ERROR" _region messages

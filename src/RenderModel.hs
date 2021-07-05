@@ -1,15 +1,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE DerivingStrategies  #-}
 
 module RenderModel where
 
 import Prelude hiding (FilePath)
 import Model
 
-import Data.Maybe (catMaybes)
-import ColorMap  (maybeColor)
-
 import qualified Data.Text          as T
-import qualified Data.Text.IO       as T
 import qualified Data.List.NonEmpty as N
 
 -- TODO: Remove unused imports
@@ -25,9 +22,9 @@ data ProblemsAtFileLocation =
   , problemsAtFileLocationProblemDescriptions :: N.NonEmpty ProblemDescription
   }
 
-newtype Title  = Title T.Text deriving (Eq, Show)
+newtype Title  = Title T.Text deriving stock (Eq, Show)
 
-newtype FilePath  = FilePath T.Text deriving (Eq, Show)
+newtype FilePath  = FilePath T.Text deriving stock (Eq, Show)
 
 data GeneralProblemsInFile =
   GeneralProblemsInFile {

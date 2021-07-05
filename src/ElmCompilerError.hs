@@ -8,8 +8,6 @@ import RenderModel
 import Theme
 import ColorMap (maybeColor)
 import Data.Maybe (catMaybes)
-import Data.Foldable (traverse_)
-import Control.Monad (when)
 
 import qualified Data.List.NonEmpty as N
 
@@ -20,7 +18,7 @@ processError RuntimeConfig { runtimeConfigColorMap = colorMap, runtimeConfigConf
 
 
       processCompilerErrors :: Error -> N.NonEmpty ProblemsAtFileLocation
-      processCompilerErrors (Error filePath _ problems) = problemsAtFileLocation (FilePath filePath) <$> problems
+      processCompilerErrors (Error filePath _ compilerProblems) = problemsAtFileLocation (FilePath filePath) <$> compilerProblems
 
 
       problemsAtFileLocation :: FilePath -> Problem -> ProblemsAtFileLocation

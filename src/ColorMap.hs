@@ -1,11 +1,9 @@
 module ColorMap where
 
-import Model (ColorMap, MessageFormatType(..), showt)
+import Model (ColorMap, showt)
 import System.Console.ANSI
-import System.Console.ANSI.Types (Color)
 
 import qualified Data.Text            as T
-import qualified Data.Text.IO         as T
 import qualified Data.Map.Strict      as M
 
 allColorNamesMap :: ColorMap

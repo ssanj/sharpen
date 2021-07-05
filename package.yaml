@@ -23,7 +23,9 @@ dependencies:
 - base >= 4.7 && < 5
 
 library:
+
   source-dirs: src
+
   dependencies:
   - text
   - bytestring
@@ -33,25 +35,54 @@ library:
   - ansi-terminal
   - containers
 
+  ghc-options:
+  - -Werror
+  - -Weverything
+  - -fprint-potential-instances
+  - -fprint-expanded-synonyms
+  - -fno-warn-missing-import-lists
+  - -fno-warn-all-missed-specialisations
+  - -Wno-implicit-prelude
+  - -Wno-unsafe
+  - -Wno-safe
+  - -Wno-type-defaults
+  - -Wno-missing-export-lists
+
 executables:
   sharpen:
+
     main:                Main.hs
+
     source-dirs:         app
+
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+
     dependencies:
     - sharpen
 
 tests:
+
   sharpen-test:
     main:                Driver.hs
+
     source-dirs:         test
+
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Werror
+    - -Weverything
+    - -Wno-unsafe
+    - -Wno-safe
+    - -Wno-implicit-prelude
+    - -Wno-missing-import-lists
+    - -Wno-missing-export-lists
+    - -Wno-missing-local-signatures
+
     dependencies:
     - sharpen
     - tasty
