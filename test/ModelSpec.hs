@@ -30,7 +30,7 @@ unit_colorToMaybeColorTypeCompilerSuggestionColor =
 
 unit_colorToMaybeColorTypeOtherColor :: Assertion
 unit_colorToMaybeColorTypeOtherColor =
-  let actual   = traverse colorToMaybeColorType ["indigo", "LIme", "Rouge", "Sky Blue"]
-      expected = Nothing
+  let actual   = colorToMaybeColorType <$> ["indigo", "LIme", "Rouge", "Sky Blue"]
+      expected = [Nothing, Nothing, Nothing, Nothing]
   in actual @?= expected
 
