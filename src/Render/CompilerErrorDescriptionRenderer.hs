@@ -1,4 +1,4 @@
-module Render.ElmCompilerErrorRender where
+module Render.CompilerErrorDescriptionRenderer where
 
 import RenderModel (CompilerErrorDescription)
 

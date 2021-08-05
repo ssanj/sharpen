@@ -9,7 +9,7 @@ import Data.Maybe (catMaybes)
 processError2 :: DependencyError -> IO ()
 processError2 (DependencyError path title nonEmptyMessages) =
   let problems = problemDescription <$> nonEmptyMessages
-      genProblemsInFile = GeneralProblemsInFile (Title title) (FilePath path) problems
+      genProblemsInFile = DependencyErrorDescription (Title title) (FilePath path) problems
   in renderGeneralProblemsInFile genProblemsInFile
 
 

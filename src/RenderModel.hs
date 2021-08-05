@@ -6,6 +6,8 @@ module RenderModel where
 import Prelude hiding (FilePath)
 import Model
 
+import System.Console.ANSI (Color)
+
 import qualified Data.Text          as T
 import qualified Data.List.NonEmpty as N
 
@@ -26,12 +28,34 @@ newtype Title  = Title T.Text deriving stock (Eq, Show)
 
 newtype FilePath  = FilePath T.Text deriving stock (Eq, Show)
 
-data GeneralProblemsInFile =
-  GeneralProblemsInFile {
-    generalProblemsInFileTitle                   :: Title
-  , generalProblemsInFilePath                    :: FilePath
-  , generalProblemsInFilePathProblemDescriptions :: N.NonEmpty ProblemDescription
+data DependencyErrorDescription =
+  DependencyErrorDescription {
+    dependencyErrorDescriptionTitle                   :: Title
+  , dependencyErrorDescriptionPath                    :: FilePath
+  , dependencyErrorDescriptionPathProblemDescriptions :: N.NonEmpty ProblemDescription
   }
+
+data CompilerErrorTheme =
+  CompilerErrorTheme {
+    compilerErrorThemeTitleColor      :: Color
+  , compilerErrorThemeErrorColor      :: Color
+  , compilerErrorThemeSuggestionColor :: Color
+  }
+
+data DependencyErrorTheme =
+  DependencyErrorTheme {
+    dependencyErrorThemeErrorColor :: Color
+  }
+
+
+data RenderTheme =
+  RenderTheme {
+    renderThemeCompilerErrorTheme   :: CompilerErrorTheme
+  , renderThemeDependencyErrorTheme :: DependencyErrorTheme
+  , renderThemeborder               :: [T.Text]
+  , renderThemeparagraph            :: [T.Text]
+  , renderThemegetColor             :: ColorType -> Color
+}
 
 
 newtype CompilerErrorDescription = CompilerErrorDescription (N.NonEmpty ProblemsAtFileLocation)

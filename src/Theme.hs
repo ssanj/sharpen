@@ -95,8 +95,8 @@ createTitleAndFile (ProblemsAtFileLocation title filePath (s, e) _) =
   in withColourInline singleFileMessage titleColor >> newLines 1
 
 
-renderGeneralErrorHeader :: GeneralProblemsInFile -> IO ()
-renderGeneralErrorHeader (GeneralProblemsInFile title path _) =
+renderGeneralErrorHeader :: DependencyErrorDescription -> IO ()
+renderGeneralErrorHeader (DependencyErrorDescription title path _) =
   let heading  = "-- " <> showt title <> " ---------- " <> showt path
   in withColourInline heading titleColor >> newLines 1
 
@@ -119,11 +119,11 @@ renderCompilerErrorDescription (CompilerErrorDescription errorDescriptions) = do
   newLines 2
 
 
-renderGeneralProblemsInFile :: GeneralProblemsInFile  -> IO ()
+renderGeneralProblemsInFile :: DependencyErrorDescription  -> IO ()
 renderGeneralProblemsInFile probsInFile =
   do
     border
     renderGeneralErrorHeader probsInFile
     paragraph
-    traverse_  renderProblem $ generalProblemsInFilePathProblemDescriptions probsInFile
+    traverse_  renderProblem $ dependencyErrorDescriptionPathProblemDescriptions probsInFile
     border

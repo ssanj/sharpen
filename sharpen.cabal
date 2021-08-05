@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 608e8da1c45387ec8b611e2b71f589cb910df4a4733d035e6a8ea7be1ff4aa87
+-- hash: 8a1d465b3dd0b73958b62575d284ba726937d4fb36f9ec08abbf2cedd125246d
 
 name:           sharpen
 version:        0.2.0.0
@@ -34,7 +34,8 @@ library
       ElmCompilerErrorToRenderModel
       Lib
       Model
-      Render.ElmCompilerErrorRender
+      Render.CompilerErrorDescriptionRenderer
+      Render.DependencyErrorDescriptionRenderer
       RenderModel
       Theme
   other-modules:
