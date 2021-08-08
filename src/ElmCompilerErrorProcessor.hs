@@ -5,12 +5,11 @@ module ElmCompilerErrorProcessor (processError) where
 import Prelude hiding (FilePath)
 import Model
 import RenderModel
-import Theme
 import Data.Maybe (catMaybes)
 
 import qualified Data.List.NonEmpty as N
 
-processError :: RuntimeConfig -> CompilerError -> IO ()
+processError :: RuntimeConfig -> CompilerError -> CompilerErrorRenderModel
 processError RuntimeConfig { runtimeConfigConfig = config } compilerError =
   let compilerErrorToProblemsAtFileLocations :: CompilerError -> N.NonEmpty ProblemsAtFileLocation
       compilerErrorToProblemsAtFileLocations (CompilerError nonEmptyErrors _) = processCompilerErrors =<< nonEmptyErrors
@@ -49,6 +48,4 @@ processError RuntimeConfig { runtimeConfigConfig = config } compilerError =
       numProblemsDisplayed = N.length problemsToDisplay
       compilerErrorDesc    = CompilerErrorDescription problemsToDisplay
 
-      renderEnabledStats   = renderStats stats numProblemsDisplayed
-      renderCompilerErrors = renderCompilerErrorDescription compilerErrorDesc
-  in renderCompilerErrors >> renderEnabledStats
+  in CompilerErrorRenderModel compilerErrorDesc numProblemsDisplayed stats

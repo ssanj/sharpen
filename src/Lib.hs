@@ -11,7 +11,7 @@ import Prelude hiding (FilePath)
 import Model
 import ColorMap
 import RenderModel
-import Theme (renderGeneralProblemsInFile)
+import Theme (renderGeneralProblemsInFile, renderStats, renderStats, renderCompilerErrorDescription)
 
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
@@ -38,8 +38,19 @@ sharpen config = do
 simplePrinter :: RuntimeConfig -> ElmCompilerOutput -> IO ()
 simplePrinter rc elmCompilerOutput =
   case elmCompilerOutput of
-    ElmError compilerError  -> CE.processError rc compilerError
+    ElmError compilerError  -> handleCompilerError $ CE.processError rc compilerError
     OtherError generalError -> handleGeneralError $ DEP.processError rc generalError
+
+handleCompilerError :: CompilerErrorRenderModel -> IO ()
+handleCompilerError compilerErrorRenderModel =
+  let
+      compilerErrorDesc    = compilerErrorRenderModelCompilerErrorDescription compilerErrorRenderModel
+      numProblemsDisplayed = compilerErrorRenderModelProblemsToDisplay compilerErrorRenderModel
+      stats                = compilerErrorRenderModelStats compilerErrorRenderModel
+
+      renderEnabledStats   = renderStats stats numProblemsDisplayed
+      renderCompilerErrors = renderCompilerErrorDescription compilerErrorDesc
+  in renderCompilerErrors >> renderEnabledStats
 
 handleGeneralError :: DependencyErrorDescription -> IO ()
 handleGeneralError = renderGeneralProblemsInFile

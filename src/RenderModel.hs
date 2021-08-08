@@ -42,7 +42,7 @@ data CompilerErrorTheme =
   , compilerErrorThemeSuggestionColor :: Color
   }
 
-data DependencyErrorTheme =
+newtype DependencyErrorTheme =
   DependencyErrorTheme {
     dependencyErrorThemeErrorColor :: Color
   }
@@ -59,4 +59,11 @@ data RenderTheme =
 
 
 newtype CompilerErrorDescription = CompilerErrorDescription (N.NonEmpty ProblemsAtFileLocation)
+
+data CompilerErrorRenderModel =
+  CompilerErrorRenderModel {
+    compilerErrorRenderModelCompilerErrorDescription :: CompilerErrorDescription
+  , compilerErrorRenderModelProblemsToDisplay        :: Int
+  , compilerErrorRenderModelStats                    :: Stats
+  }
 

@@ -66,6 +66,7 @@ data Error =
 
 data ElmCompilerOutput = ElmError CompilerError
                        | OtherError DependencyError deriving stock (Generic, Eq, Show)
+                       --            ^-- We'd need an ADT here if we can have more "Other Errors" come through
 
 
 data DependencyError =
