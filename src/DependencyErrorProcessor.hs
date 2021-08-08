@@ -2,15 +2,14 @@ module DependencyErrorProcessor (processError) where
 
 import Model
 import RenderModel
-import Theme
 
 import Data.Maybe (catMaybes)
 
-processError :: RuntimeConfig -> DependencyError -> IO ()
+processError :: RuntimeConfig -> DependencyError -> DependencyErrorDescription
 processError _ (DependencyError path title nonEmptyMessages) =
   let problems = problemDescription <$> nonEmptyMessages
       genProblemsInFile = DependencyErrorDescription (Title title) (FilePath path) problems
-  in renderGeneralProblemsInFile genProblemsInFile
+  in genProblemsInFile
 
 
 problemDescription :: Message -> ProblemDescription

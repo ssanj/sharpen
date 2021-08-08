@@ -10,6 +10,8 @@ import Prelude hiding (FilePath)
 
 import Model
 import ColorMap
+import RenderModel
+import Theme (renderGeneralProblemsInFile)
 
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
@@ -37,6 +39,7 @@ simplePrinter :: RuntimeConfig -> ElmCompilerOutput -> IO ()
 simplePrinter rc elmCompilerOutput =
   case elmCompilerOutput of
     ElmError compilerError  -> CE.processError rc compilerError
-    OtherError generalError -> DEP.processError rc generalError
+    OtherError generalError -> handleGeneralError $ DEP.processError rc generalError
 
-
+handleGeneralError :: DependencyErrorDescription -> IO ()
+handleGeneralError = renderGeneralProblemsInFile
