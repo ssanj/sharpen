@@ -14,7 +14,7 @@ import ColorMap
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
 import DependencyErrorProcessor       as DEP
-import ElmCompilerError               as CE
+import ElmCompilerErrorProcessor      as CE
 
 sharpen :: Config -> IO ()
 sharpen config = do

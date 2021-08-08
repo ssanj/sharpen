@@ -1,6 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module ElmCompilerError (processError) where
+module ElmCompilerErrorProcessor (processError) where
 
 import Prelude hiding (FilePath)
 import Model
