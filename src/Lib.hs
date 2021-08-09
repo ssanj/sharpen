@@ -9,14 +9,14 @@ import System.IO hiding (FilePath)
 import Prelude hiding (FilePath)
 
 import Model
-import ColorMap
-import RenderModel
-import Theme (renderGeneralProblemsInFile, renderStats, renderStats, renderCompilerErrorDescription)
+import ColorMap (allColorNamesMap)
 
-import qualified Data.Text            as T
-import qualified Data.Text.IO         as T
-import DependencyErrorProcessor       as DEP
-import ElmCompilerErrorProcessor      as CE
+import qualified Data.Text                     as T
+import qualified Data.Text.IO                  as T
+import DependencyErrorProcessor                as DEP
+import ElmCompilerErrorProcessor               as CE
+import Render.CompilerErrorDescriptionRenderer as RCE
+import Render.DependencyErrorDescriptionRenderer as RDE
 
 sharpen :: Config -> IO ()
 sharpen config = do
@@ -38,19 +38,6 @@ sharpen config = do
 simplePrinter :: RuntimeConfig -> ElmCompilerOutput -> IO ()
 simplePrinter rc elmCompilerOutput =
   case elmCompilerOutput of
-    ElmError compilerError  -> renderCompilerError $ CE.processError rc compilerError
-    OtherError otherError -> renderOtherError $ DEP.processError rc otherError
+    ElmError compilerError -> RCE.render $ CE.processError rc compilerError
+    OtherError otherError  -> RDE.render $ DEP.processError rc otherError
 
-renderCompilerError :: CompilerErrorRenderModel -> IO ()
-renderCompilerError compilerErrorRenderModel =
-  let
-      compilerErrorDesc    = compilerErrorRenderModelCompilerErrorDescription compilerErrorRenderModel
-      numProblemsDisplayed = compilerErrorRenderModelProblemsToDisplay compilerErrorRenderModel
-      stats                = compilerErrorRenderModelStats compilerErrorRenderModel
-
-      renderEnabledStats   = renderStats stats numProblemsDisplayed
-      renderCompilerErrors = renderCompilerErrorDescription compilerErrorDesc
-  in renderCompilerErrors >> renderEnabledStats
-
-renderOtherError :: DependencyErrorDescription -> IO ()
-renderOtherError = renderGeneralProblemsInFile
