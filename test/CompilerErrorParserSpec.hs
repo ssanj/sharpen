@@ -22,6 +22,7 @@ unit_decodeCompilerError = do
 assertCompilerError :: CompilerError -> Assertion
 assertCompilerError compilerError = do
   "compile-errors" @?= compilererrorType compilerError
+  1 @?= N.length (compilererrorErrors compilerError)
   let problems = errorProblems . N.head . compilererrorErrors $ compilerError
   problems @?= namingError1  :| [ namingError2 ]
 
