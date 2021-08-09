@@ -38,11 +38,11 @@ sharpen config = do
 simplePrinter :: RuntimeConfig -> ElmCompilerOutput -> IO ()
 simplePrinter rc elmCompilerOutput =
   case elmCompilerOutput of
-    ElmError compilerError  -> handleCompilerError $ CE.processError rc compilerError
-    OtherError generalError -> handleGeneralError $ DEP.processError rc generalError
+    ElmError compilerError  -> renderCompilerError $ CE.processError rc compilerError
+    OtherError otherError -> renderOtherError $ DEP.processError rc otherError
 
-handleCompilerError :: CompilerErrorRenderModel -> IO ()
-handleCompilerError compilerErrorRenderModel =
+renderCompilerError :: CompilerErrorRenderModel -> IO ()
+renderCompilerError compilerErrorRenderModel =
   let
       compilerErrorDesc    = compilerErrorRenderModelCompilerErrorDescription compilerErrorRenderModel
       numProblemsDisplayed = compilerErrorRenderModelProblemsToDisplay compilerErrorRenderModel
@@ -52,5 +52,5 @@ handleCompilerError compilerErrorRenderModel =
       renderCompilerErrors = renderCompilerErrorDescription compilerErrorDesc
   in renderCompilerErrors >> renderEnabledStats
 
-handleGeneralError :: DependencyErrorDescription -> IO ()
-handleGeneralError = renderGeneralProblemsInFile
+renderOtherError :: DependencyErrorDescription -> IO ()
+renderOtherError = renderGeneralProblemsInFile
