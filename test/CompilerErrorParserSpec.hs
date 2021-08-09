@@ -4,12 +4,11 @@
 module CompilerErrorParserSpec where
 
 import Model
+import TestUtil
 
-import Test.Tasty.HUnit     (assertFailure, (@?=), Assertion)
+import Test.Tasty.HUnit     ((@?=), Assertion)
 import Data.List.NonEmpty   (NonEmpty((:|)))
 
-import qualified Data.Text          as T
-import qualified Data.Text.IO       as T
 import qualified Data.List.NonEmpty as N
 
 
@@ -17,34 +16,7 @@ unit_decodeCompilerError :: Assertion
 unit_decodeCompilerError = do
   input <- getInput "resources/compiler-error-1.json"
   let decodedE = decodeCompilerError input
-  either failWithError assertCompilerError decodedE
-
-
-failWithError :: String -> Assertion
-failWithError e =
-    let errorMessage = show e
-    in assertFailure ("Could not decode input: " <> errorMessage)
-
-
-messageLine :: T.Text ->  Message
-messageLine = MessageLine . MessageText
-
-
-messageFormatGeneralError :: T.Text -> Message
-messageFormatGeneralError message = MessageFormatting $ MessageFormat False False (Just "GREEN") message
-
-
-
-messageFormatError :: T.Text -> Message
-messageFormatError message = MessageFormatting $ MessageFormat False False (Just "RED") message
-
-
-messageFormatSuggestion :: T.Text -> Message
-messageFormatSuggestion message = MessageFormatting $ MessageFormat False False (Just "yellow") message
-
-
-messageFormatHint :: T.Text -> Message
-messageFormatHint message = MessageFormatting $ MessageFormat False True Nothing message
+  either failWithDecodingError assertCompilerError decodedE
 
 
 assertCompilerError :: CompilerError -> Assertion
@@ -52,10 +24,6 @@ assertCompilerError compilerError = do
   "compile-errors" @?= compilererrorType compilerError
   let problems = errorProblems . N.head . compilererrorErrors $ compilerError
   problems @?= namingError1  :| [ namingError2 ]
-
-
-getInput :: String -> IO T.Text
-getInput = T.readFile
 
 
 namingError1 :: Problem

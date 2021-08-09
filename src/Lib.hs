@@ -18,6 +18,7 @@ import ElmCompilerErrorProcessor               as CE
 import Render.CompilerErrorDescriptionRenderer as RCE
 import Render.DependencyErrorDescriptionRenderer as RDE
 
+
 sharpen :: Config -> IO ()
 sharpen config = do
   let runtimeConfig = RuntimeConfig config allColorNamesMap

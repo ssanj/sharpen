@@ -5,6 +5,7 @@ import RenderModel
 
 import Data.Maybe (catMaybes)
 
+
 processError :: RuntimeConfig -> DependencyError -> DependencyErrorDescription
 processError _ (DependencyError path title nonEmptyMessages) =
   let problems = problemDescription <$> nonEmptyMessages

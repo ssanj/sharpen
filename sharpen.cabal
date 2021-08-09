@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 321cd87c4535f27eb6105e751dfaa12aac58708831a97cab4cabf85065861f06
+-- hash: e1229627280ff69b1365c42884316b0bc81587c90e87e784dbbec42080d12e16
 
 name:           sharpen
 version:        0.2.0.0
@@ -72,6 +72,7 @@ test-suite sharpen-test
       CompilerErrorParserSpec
       DependencyErrorParserSpec
       ModelSpec
+      TestUtil
       Paths_sharpen
   hs-source-dirs:
       test

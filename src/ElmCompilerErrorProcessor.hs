@@ -9,6 +9,7 @@ import Data.Maybe (catMaybes)
 
 import qualified Data.List.NonEmpty as N
 
+
 processError :: RuntimeConfig -> CompilerError -> CompilerErrorRenderModel
 processError RuntimeConfig { runtimeConfigConfig = config } compilerError =
   let compilerErrorToProblemsAtFileLocations :: CompilerError -> N.NonEmpty ProblemsAtFileLocation

@@ -6,6 +6,7 @@ import System.Console.ANSI
 import qualified Data.Text            as T
 import qualified Data.Map.Strict      as M
 
+
 allColorNamesMap :: ColorMap
 allColorNamesMap =
   let allColors     = enumFromTo (minBound::Color) (maxBound:: Color)

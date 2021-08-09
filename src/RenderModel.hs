@@ -11,6 +11,7 @@ import System.Console.ANSI (Color)
 import qualified Data.Text          as T
 import qualified Data.List.NonEmpty as N
 
+
 -- TODO: Remove unused imports
 data ProblemDescription = ProblemDescription [MessageFormatType] T.Text
 

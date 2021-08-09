@@ -4,25 +4,18 @@
 module DependencyErrorParserSpec where
 
 import Model
+import TestUtil
 
-import Test.Tasty.HUnit     (assertFailure, (@?=), Assertion)
+import Test.Tasty.HUnit     ((@?=), Assertion)
 import Data.List.NonEmpty   (NonEmpty((:|)))
 
 import qualified Data.Text          as T
-import qualified Data.Text.IO       as T
-
 
 unit_decodeDependencyError :: Assertion
 unit_decodeDependencyError = do
   input <- getInput "resources/dependency-error.json"
   let decodedE = decodeDependencyError input
-  either failWithError assertDependencyError decodedE
-
-
-failWithError :: String -> Assertion
-failWithError e =
-    let errorMessage = show e
-    in assertFailure ("Could not decode input: " <> errorMessage)
+  either failWithDecodingError assertDependencyError decodedE
 
 
 assertDependencyError :: DependencyError -> Assertion
@@ -69,29 +62,3 @@ assertDependencyError generalError =
               ]
       expected = DependencyError path title messages
   in generalError @?= expected
-
-
-messageLine :: T.Text ->  Message
-messageLine = MessageLine . MessageText
-
-
-messageFormatGeneralError :: T.Text -> Message
-messageFormatGeneralError message = MessageFormatting $ MessageFormat False False (Just "GREEN") message
-
-
-
-messageFormatError :: T.Text -> Message
-messageFormatError message = MessageFormatting $ MessageFormat False False (Just "RED") message
-
-
-messageFormatSuggestion :: T.Text -> Message
-messageFormatSuggestion message = MessageFormatting $ MessageFormat False False (Just "yellow") message
-
-
-messageFormatHint :: T.Text -> Message
-messageFormatHint message = MessageFormatting $ MessageFormat False True Nothing message
-
-
-
-getInput :: String -> IO T.Text
-getInput = T.readFile
