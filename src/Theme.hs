@@ -52,7 +52,7 @@ paragraph = newLines 1
 renderFormatting :: MessageFormatType -> IO ()
 renderFormatting (ColorFormat colorType) =
   let colorsToSGR :: Color -> [SGR]
-      colorsToSGR color = [ SetColor Foreground Dull color]
+      colorsToSGR color = [SetColor Foreground Dull color]
 
       sgrColors :: [SGR]
       sgrColors = colorsToSGR $ colorTypeToColor colorType
@@ -127,3 +127,26 @@ renderGeneralProblemsInFile probsInFile =
     paragraph
     traverse_  renderProblem $ dependencyErrorDescriptionPathProblemDescriptions probsInFile
     border
+
+
+border2 :: ColorTheme -> IO ()
+border2 ColorTheme {colorThemeBorderLines=blines} = newLines blines
+
+paragraph2 :: ColorTheme ->  IO ()
+paragraph2 ColorTheme {colorThemeParagraphLines=plines} = newLines plines
+
+renderGeneralErrorHeader2 :: ColorTheme -> DependencyErrorDescription -> IO ()
+renderGeneralErrorHeader2 colorTheme (DependencyErrorDescription title path _) =
+  let heading     = "-- " <> showt title <> " ---------- " <> showt path
+      titleColor2 = colorThemeTitleColor colorTheme
+  in withColourInline heading titleColor2 >> paragraph2 colorTheme
+
+
+renderGeneralProblemsInFile2 :: ColorTheme -> DependencyErrorDescription  -> IO ()
+renderGeneralProblemsInFile2 colorTheme probsInFile =
+  do
+    border2 colorTheme
+    renderGeneralErrorHeader2 colorTheme probsInFile
+    paragraph2 colorTheme
+    traverse_  renderProblem $ dependencyErrorDescriptionPathProblemDescriptions probsInFile
+    border2 colorTheme

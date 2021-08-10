@@ -170,6 +170,17 @@ colorToMaybeColorType colorText =
     "GREEN"  -> Just DependencyErrorColor
     _        -> Nothing
 
+
+data ColorTheme =
+  ColorTheme {
+    colorThemeTitleColor           :: Color
+  , colorThemeErrorColor           :: Color
+  , colorThemeSuggestionColor      :: Color
+  , colorThemeDependencyErrorColor :: Color
+  , colorThemeBorderLines          :: Int    -- How many newlines
+  , colorThemeParagraphLines       :: Int    -- How many newlines
+  } deriving stock (Show)
+
 -- TODO: Rename
 
 
