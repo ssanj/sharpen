@@ -125,11 +125,24 @@ printNumberOfCompilationErrors errors =
   T.putStr "Compilation errors: " >> withColourInline (showt errors) errorColor
 
 
+printNumberOfCompilationErrors2 :: Printer -> Int -> IO ()
+printNumberOfCompilationErrors2 printer errors =
+  T.putStr "Compilation errors: " >> printerError printer (showt errors)
+
+
 renderStats :: Stats -> Int -> IO ()
 renderStats stats numberOfErrors =
   when (stats == StatsOn) $ do
     printNumberOfCompilationErrors numberOfErrors
     newLines 2
+
+renderStats2 :: Printer -> Stats -> Int -> IO ()
+renderStats2 printer stats numberOfErrors =
+  when (stats == StatsOn) $ do
+    printNumberOfCompilationErrors2 printer numberOfErrors
+    printerBorder printer
+
+
 
 
 renderCompilerErrorDescription :: CompilerErrorDescription ->  IO ()
@@ -205,6 +218,7 @@ fromTheme theme =
       printerBorder           = newLinesX $ colorThemeBorderLines theme
     , printerParagraph        = newLinesX $ colorThemeParagraphLines theme
     , printerTitleColor       = \title ->  withColourInlineX title (colorThemeTitleColor theme) >> newLinesX 1
+    , printerError            = \errorStr -> withColourInlineX errorStr (colorThemeErrorColor theme)
     , printerResetAnsi        = setSGR [Reset]
     , printerRenderFormatting = renderFormattingX
     , printerNewLines         = newLinesX
@@ -215,6 +229,7 @@ data Printer =
     printerBorder           :: IO ()
   , printerParagraph        :: IO ()
   , printerTitleColor       :: T.Text -> IO ()
+  , printerError            :: T.Text -> IO ()
   , printerResetAnsi        :: IO ()
   , printerRenderFormatting :: MessageFormatType -> IO ()
   , printerNewLines         :: Int -> IO ()
