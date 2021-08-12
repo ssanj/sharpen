@@ -62,6 +62,7 @@ executables:
 
     dependencies:
     - sharpen
+    - ansi-terminal
 
 tests:
 

@@ -181,6 +181,18 @@ data ColorTheme =
   , colorThemeParagraphLines       :: Int    -- How many newlines
   } deriving stock (Show)
 
+
+data Printer =
+  Printer {
+    printerBorder           :: IO ()
+  , printerParagraph        :: IO ()
+  , printerTitleColor       :: T.Text -> IO ()
+  , printerError            :: T.Text -> IO ()
+  , printerResetAnsi        :: IO ()
+  , printerRenderFormatting :: MessageFormatType -> IO ()
+  , printerNewLines         :: Int -> IO ()
+  }
+
 -- TODO: Rename
 
 

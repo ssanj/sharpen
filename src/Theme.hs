@@ -223,14 +223,3 @@ fromTheme theme =
     , printerRenderFormatting = renderFormattingX
     , printerNewLines         = newLinesX
     }
-
-data Printer =
-  Printer {
-    printerBorder           :: IO ()
-  , printerParagraph        :: IO ()
-  , printerTitleColor       :: T.Text -> IO ()
-  , printerError            :: T.Text -> IO ()
-  , printerResetAnsi        :: IO ()
-  , printerRenderFormatting :: MessageFormatType -> IO ()
-  , printerNewLines         :: Int -> IO ()
-  }

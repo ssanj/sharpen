@@ -2,6 +2,7 @@ module Main where
 
 import Lib (sharpen)
 import Cmd
+import Colors
 
 main :: IO ()
 main = do
@@ -9,5 +10,5 @@ main = do
   case args of
     Left errorMessage    -> putStrLn errorMessage
     Right (Info message) -> putStrLn message
-    Right (Run config)   -> sharpen config
+    Right (Run config)   -> sharpen defaultTheme config
 

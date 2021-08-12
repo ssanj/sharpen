@@ -19,8 +19,8 @@ import Render.CompilerErrorDescriptionRenderer as RCE
 import Render.DependencyErrorDescriptionRenderer as RDE
 
 
-sharpen :: Config -> IO ()
-sharpen config = do
+sharpen :: ColorTheme -> Config -> IO ()
+sharpen _ config = do
   let runtimeConfig = RuntimeConfig config allColorNamesMap
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
