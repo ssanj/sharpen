@@ -20,8 +20,8 @@ import Render.DependencyErrorDescriptionRenderer as RDE
 
 
 sharpen :: ColorTheme -> Config -> IO ()
-sharpen _ config = do
-  let runtimeConfig = RuntimeConfig config allColorNamesMap
+sharpen colorTheme config = do
+  let runtimeConfig = RuntimeConfig config allColorNamesMap colorTheme
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
   else
@@ -38,7 +38,9 @@ sharpen _ config = do
 
 simplePrinter :: RuntimeConfig -> ElmCompilerOutput -> IO ()
 simplePrinter rc elmCompilerOutput =
-  case elmCompilerOutput of
-    ElmError compilerError -> RCE.render $ CE.processError rc compilerError
-    OtherError otherError  -> RDE.render $ DEP.processError rc otherError
+  let colorTheme = runtimeConfigColorTheme rc
+  in
+    case elmCompilerOutput of
+      ElmError compilerError -> RCE.render $ CE.processError rc compilerError
+      OtherError otherError  -> RDE.render colorTheme $ DEP.processError rc otherError
 

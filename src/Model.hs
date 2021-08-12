@@ -28,8 +28,9 @@ type ColorMap = M.Map T.Text Color
 
 data RuntimeConfig =
   RuntimeConfig {
-    runtimeConfigConfig :: Config
-  , runtimeConfigColorMap :: ColorMap
+    runtimeConfigConfig     :: Config
+  , runtimeConfigColorMap   :: ColorMap
+  , runtimeConfigColorTheme :: ColorTheme
   }
 
 
