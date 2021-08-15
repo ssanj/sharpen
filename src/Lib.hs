@@ -11,11 +11,11 @@ import Prelude hiding (FilePath)
 import Model
 import ColorMap (allColorNamesMap)
 
-import qualified Data.Text                     as T
-import qualified Data.Text.IO                  as T
-import DependencyErrorProcessor                as DEP
-import ElmCompilerErrorProcessor               as CE
-import Render.CompilerErrorDescriptionRenderer as RCE
+import qualified Data.Text                       as T
+import qualified Data.Text.IO                    as T
+import DependencyErrorProcessor                  as DEP
+import ElmCompilerErrorProcessor                 as CE
+import Render.CompilerErrorDescriptionRenderer   as RCE
 import Render.DependencyErrorDescriptionRenderer as RDE
 
 
@@ -41,6 +41,6 @@ simplePrinter rc elmCompilerOutput =
   let colorTheme = runtimeConfigColorTheme rc
   in
     case elmCompilerOutput of
-      ElmError compilerError -> RCE.render $ CE.processError rc compilerError
+      ElmError compilerError -> RCE.render colorTheme $ CE.processError rc compilerError
       OtherError otherError  -> RDE.render colorTheme $ DEP.processError rc otherError
 

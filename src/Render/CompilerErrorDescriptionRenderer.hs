@@ -1,16 +1,16 @@
 module Render.CompilerErrorDescriptionRenderer where
 
+import Model       (ColorTheme(..))
 import RenderModel (CompilerErrorRenderModel(..))
+import Theme       (renderStats2, renderCompilerErrorDescription2, fromTheme)
 
-import Theme (renderStats, renderCompilerErrorDescription)
-
-render :: CompilerErrorRenderModel -> IO ()
-render compilerErrorRenderModel =
+render :: ColorTheme -> CompilerErrorRenderModel -> IO ()
+render colorTheme compilerErrorRenderModel =
   let
       compilerErrorDesc    = compilerErrorRenderModelCompilerErrorDescription compilerErrorRenderModel
       numProblemsDisplayed = compilerErrorRenderModelProblemsToDisplay compilerErrorRenderModel
       stats                = compilerErrorRenderModelStats compilerErrorRenderModel
-
-      renderEnabledStats   = renderStats stats numProblemsDisplayed
-      renderCompilerErrors = renderCompilerErrorDescription compilerErrorDesc
+      printer              = fromTheme colorTheme
+      renderEnabledStats   = renderStats2 printer stats numProblemsDisplayed
+      renderCompilerErrors = renderCompilerErrorDescription2 printer compilerErrorDesc
   in renderCompilerErrors >> renderEnabledStats
