@@ -13,63 +13,63 @@ import Data.Foldable (traverse_)
 import Control.Monad (when)
 
 
-renderProblem2 :: Printer -> ProblemDescription -> IO ()
-renderProblem2 printer (ProblemDescription formatting message) =
+renderProblem :: Printer -> ProblemDescription -> IO ()
+renderProblem printer (ProblemDescription formatting message) =
   let formattingApplied = traverse_ (printerRenderFormatting printer) formatting
   in formattingApplied >> T.putStr message >> (printerResetAnsi printer)
 
 
 
-renderFileProblems2 :: Printer -> ProblemsAtFileLocation -> IO ()
-renderFileProblems2 printer pfl@(ProblemsAtFileLocation _ _ _ problems) =
+renderFileProblems :: Printer -> ProblemsAtFileLocation -> IO ()
+renderFileProblems printer pfl@(ProblemsAtFileLocation _ _ _ problems) =
   do
-    createTitleAndFile2 printer pfl
+    createTitleAndFile printer pfl
     printerParagraph printer
-    traverse_  (renderProblem2 printer) problems
+    traverse_  (renderProblem printer) problems
 
 
-createTitleAndFile2 :: Printer -> ProblemsAtFileLocation -> IO ()
-createTitleAndFile2 printer (ProblemsAtFileLocation title filePath (s, e) _) =
+createTitleAndFile :: Printer -> ProblemsAtFileLocation -> IO ()
+createTitleAndFile printer (ProblemsAtFileLocation title filePath (s, e) _) =
   let coords = showt s <> ":" <> showt e
       singleFileMessage = "-- " <> showt title <> " ---------- " <> showt filePath <> ":" <> coords
   in (printerTitleColor printer $ singleFileMessage) >> (printerParagraph printer)
 
 
 
-printNumberOfCompilationErrors2 :: Printer -> Int -> IO ()
-printNumberOfCompilationErrors2 printer errors =
+printNumberOfCompilationErrors :: Printer -> Int -> IO ()
+printNumberOfCompilationErrors printer errors =
   T.putStr "Compilation errors: " >> printerError printer (showt errors)
 
 
-renderStats2 :: Printer -> Stats -> Int -> IO ()
-renderStats2 printer stats numberOfErrors =
+renderStats :: Printer -> Stats -> Int -> IO ()
+renderStats printer stats numberOfErrors =
   when (stats == StatsOn) $ do
-    printNumberOfCompilationErrors2 printer numberOfErrors
+    printNumberOfCompilationErrors printer numberOfErrors
     printerBorder printer
 
 
-renderCompilerErrorDescription2 :: Printer -> CompilerErrorDescription ->  IO ()
-renderCompilerErrorDescription2 printer (CompilerErrorDescription errorDescriptions) = do
+renderCompilerErrorDescription :: Printer -> CompilerErrorDescription ->  IO ()
+renderCompilerErrorDescription printer (CompilerErrorDescription errorDescriptions) = do
   let borderX = printerBorder printer
-  traverse_ (\ed -> borderX >> renderFileProblems2 printer ed) errorDescriptions
+  traverse_ (\ed -> borderX >> renderFileProblems printer ed) errorDescriptions
   borderX
 
 
-renderGeneralErrorHeader2 :: Printer -> DependencyErrorDescription -> IO ()
-renderGeneralErrorHeader2 printer (DependencyErrorDescription title path _) =
+renderGeneralErrorHeader :: Printer -> DependencyErrorDescription -> IO ()
+renderGeneralErrorHeader printer (DependencyErrorDescription title path _) =
   let heading     = "-- " <> showt title <> " ---------- " <> showt path
       titleColor2 = printerTitleColor printer $ heading
       paragraph3  = printerParagraph printer
   in titleColor2 >> paragraph3
 
 
-renderGeneralProblemsInFile2 :: Printer -> DependencyErrorDescription  -> IO ()
-renderGeneralProblemsInFile2 printer probsInFile =
+renderGeneralProblemsInFile :: Printer -> DependencyErrorDescription  -> IO ()
+renderGeneralProblemsInFile printer probsInFile =
   do
     printerBorder printer
-    renderGeneralErrorHeader2 printer probsInFile
+    renderGeneralErrorHeader printer probsInFile
     printerParagraph printer
-    traverse_  (renderProblem2 printer) $ dependencyErrorDescriptionPathProblemDescriptions probsInFile
+    traverse_  (renderProblem printer) $ dependencyErrorDescriptionPathProblemDescriptions probsInFile
     printerBorder printer
 
 
