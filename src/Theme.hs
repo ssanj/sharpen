@@ -55,24 +55,6 @@ renderCompilerErrorDescription printer (CompilerErrorDescription errorDescriptio
   borderX
 
 
-renderGeneralErrorHeader :: Printer -> DependencyErrorDescription -> IO ()
-renderGeneralErrorHeader printer (DependencyErrorDescription title path _) =
-  let heading     = "-- " <> showt title <> " ---------- " <> showt path
-      titleColor2 = printerTitleColor printer $ heading
-      paragraph3  = printerParagraph printer
-  in titleColor2 >> paragraph3
-
-
-renderGeneralProblemsInFile :: Printer -> DependencyErrorDescription  -> IO ()
-renderGeneralProblemsInFile printer probsInFile =
-  do
-    printerBorder printer
-    renderGeneralErrorHeader printer probsInFile
-    printerParagraph printer
-    traverse_  (renderProblem printer) $ dependencyErrorDescriptionPathProblemDescriptions probsInFile
-    printerBorder printer
-
-
 fromTheme :: ColorTheme -> Printer
 fromTheme theme =
   let resetAnsi :: IO ()
