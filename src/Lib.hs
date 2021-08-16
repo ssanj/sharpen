@@ -11,12 +11,12 @@ import Prelude hiding (FilePath)
 import Model
 import ColorMap (allColorNamesMap)
 
-import qualified Data.Text                       as T
-import qualified Data.Text.IO                    as T
-import DependencyErrorProcessor                  as DEP
-import ElmCompilerErrorProcessor                 as CE
-import Render.CompilerErrorDescriptionRenderer   as RCE
-import Render.DependencyErrorDescriptionRenderer as RDE
+import qualified Data.Text                                 as T
+import qualified Data.Text.IO                              as T
+import qualified DependencyErrorProcessor                  as DEP
+import qualified ElmCompilerErrorProcessor                 as CE
+import qualified Render.CompilerErrorDescriptionRenderer   as RCE
+import qualified Render.DependencyErrorDescriptionRenderer as RDE
 
 
 sharpen :: ColorTheme -> Config -> IO ()

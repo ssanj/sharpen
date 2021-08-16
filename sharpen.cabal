@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dadd2ef4f4efc0e0c08851a07ab09590bc3b4b98b354b0c1ee1a98bb0ed4af03
+-- hash: 47e49fb819a21c34879be85593b8988923c30e579f97dcfbd71c6d0c17038932
 
 name:           sharpen
 version:        0.2.0.0
@@ -32,6 +32,7 @@ library
       ElmCompilerErrorProcessor
       Lib
       Model
+      Render.Common
       Render.CompilerErrorDescriptionRenderer
       Render.DependencyErrorDescriptionRenderer
       RenderModel

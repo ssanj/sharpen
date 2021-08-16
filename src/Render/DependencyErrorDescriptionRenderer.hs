@@ -3,9 +3,10 @@
 module Render.DependencyErrorDescriptionRenderer (render) where
 
 import Data.Foldable (traverse_)
-import Model       (ColorTheme, Printer(..), showt)
-import RenderModel (DependencyErrorDescription(..))
-import Theme       (renderProblem, fromTheme)
+import Model         (ColorTheme, Printer(..), showt)
+import RenderModel   (DependencyErrorDescription(..))
+import Theme         (fromTheme)
+import Render.Common (renderProblem)
 
 
 render :: ColorTheme -> DependencyErrorDescription -> IO ()

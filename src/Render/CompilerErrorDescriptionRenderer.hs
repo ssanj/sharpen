@@ -4,7 +4,8 @@ module Render.CompilerErrorDescriptionRenderer (render) where
 
 import Model         (ColorTheme(..), Stats(..), Printer(..), showt)
 import RenderModel   (CompilerErrorRenderModel(..), CompilerErrorDescription(..))
-import Theme         (fromTheme, renderFileProblems)
+import Theme         (fromTheme)
+import Render.Common (renderFileProblems)
 import Data.Foldable (traverse_)
 import Control.Monad (when)
 
