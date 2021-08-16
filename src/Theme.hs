@@ -10,14 +10,6 @@ import qualified Data.Text            as T
 import qualified Data.Text.IO         as T
 
 import Data.Foldable (traverse_)
-import Control.Monad (when)
-
-
-renderProblem :: Printer -> ProblemDescription -> IO ()
-renderProblem printer (ProblemDescription formatting message) =
-  let formattingApplied = traverse_ (printerRenderFormatting printer) formatting
-  in formattingApplied >> T.putStr message >> (printerResetAnsi printer)
-
 
 
 renderFileProblems :: Printer -> ProblemsAtFileLocation -> IO ()
@@ -35,24 +27,10 @@ createTitleAndFile printer (ProblemsAtFileLocation title filePath (s, e) _) =
   in (printerTitleColor printer $ singleFileMessage) >> (printerParagraph printer)
 
 
-
-printNumberOfCompilationErrors :: Printer -> Int -> IO ()
-printNumberOfCompilationErrors printer errors =
-  T.putStr "Compilation errors: " >> printerError printer (showt errors)
-
-
-renderStats :: Printer -> Stats -> Int -> IO ()
-renderStats printer stats numberOfErrors =
-  when (stats == StatsOn) $ do
-    printNumberOfCompilationErrors printer numberOfErrors
-    printerBorder printer
-
-
-renderCompilerErrorDescription :: Printer -> CompilerErrorDescription ->  IO ()
-renderCompilerErrorDescription printer (CompilerErrorDescription errorDescriptions) = do
-  let borderX = printerBorder printer
-  traverse_ (\ed -> borderX >> renderFileProblems printer ed) errorDescriptions
-  borderX
+renderProblem :: Printer -> ProblemDescription -> IO ()
+renderProblem printer (ProblemDescription formatting message) =
+  let formattingApplied = traverse_ (printerRenderFormatting printer) formatting
+  in formattingApplied >> T.putStr message >> (printerResetAnsi printer)
 
 
 fromTheme :: ColorTheme -> Printer
