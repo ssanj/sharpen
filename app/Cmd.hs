@@ -25,7 +25,6 @@ processArgs :: [String] -> Either String RunOrInfo
 processArgs = extractConfig defaultConfig
 
 
--- TODO: Can we use the fact that we "know" args are not empty?
 extractConfig :: Config -> [String] -> Either String RunOrInfo
 extractConfig c args =
   case args of

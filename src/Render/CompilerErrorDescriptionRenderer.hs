@@ -37,7 +37,6 @@ printNumberOfCompilationErrors printer errors =
 
 renderCompilerErrorDescription :: Printer -> CompilerErrorDescription ->  IO ()
 renderCompilerErrorDescription printer (CompilerErrorDescription errorDescriptions) = do
-  let borderX = printerBorder printer
-  traverse_ (\ed -> borderX >> renderFileProblems printer ed) errorDescriptions
-  borderX
-
+  let border = printerBorder printer
+  traverse_ (\ed -> border >> renderFileProblems printer ed) errorDescriptions
+  border
