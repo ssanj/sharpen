@@ -24,8 +24,8 @@ renderGeneralProblemsInFile printer probsInFile =
 
 
 renderGeneralErrorHeader :: Printer -> DependencyErrorDescription -> IO ()
-renderGeneralErrorHeader printer (DependencyErrorDescription title path _) =
-  let heading     = "-- " <> showt title <> " ---------- " <> showt path
-      titleColor = printerTitleColor printer $ heading
-      paragraph  = printerParagraph printer
-  in titleColor >> paragraph
+renderGeneralErrorHeader printer (DependencyErrorDescription errorHeading path _) =
+  let heading   = "-- " <> showt errorHeading <> " ---------- " <> showt path
+      title     = printerTitleColor printer heading
+      paragraph = printerParagraph printer
+  in title >> paragraph
