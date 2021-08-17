@@ -9,7 +9,6 @@ import System.IO hiding (FilePath)
 import Prelude hiding (FilePath)
 
 import Model
-import ColorMap (allColorNamesMap)
 
 import qualified Data.Text                                 as T
 import qualified Data.Text.IO                              as T
@@ -19,9 +18,8 @@ import qualified Render.CompilerErrorDescriptionRenderer   as RCE
 import qualified Render.DependencyErrorDescriptionRenderer as RDE
 
 
-sharpen :: ColorTheme -> Config -> IO ()
-sharpen colorTheme config = do
-  let runtimeConfig = RuntimeConfig config allColorNamesMap colorTheme
+sharpen :: RuntimeConfig -> IO ()
+sharpen runtimeConfig = do
   content <- T.getContents
   if T.null content then T.putStrLn "Success!"
   else

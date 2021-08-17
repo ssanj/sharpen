@@ -18,21 +18,13 @@ import qualified Data.ByteString.Lazy as B
 import qualified Data.Text            as T
 import qualified Data.Text.Encoding   as T
 import qualified Data.List.NonEmpty   as N
-import qualified Data.Map.Strict      as M
-
-
--- TODO: Remove unused imports
-
-type ColorMap = M.Map T.Text Color
 
 
 data RuntimeConfig =
   RuntimeConfig {
-    runtimeConfigConfig     :: Config
-  , runtimeConfigColorMap   :: ColorMap
-  , runtimeConfigColorTheme :: ColorTheme
+    runtimeConfigColorTheme :: ColorTheme
+  , runtimeConfigConfig     :: Config
   }
-
 
 data LineAndColumn =
   LineAndColumn {
