@@ -3,7 +3,7 @@
 module Render.Common where
 
 import Model
-import RenderModel
+import RenderModel (ProblemsAtFileLocation(..), ProblemDescription(..))
 
 import qualified Data.Text.IO         as T
 
