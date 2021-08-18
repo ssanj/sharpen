@@ -8,10 +8,11 @@ module Cmd
        ) where
 
 
-import Model              (defaultConfig, OutputDetail(..), Config(..), NumberOfErrors(..), Stats(..))
-import System.Environment (getArgs)
-import Data.List          (intercalate)
-
+import Model                  (defaultConfig, OutputDetail(..), Config(..), NumberOfErrors(..), Stats(..))
+import System.Environment     (getArgs)
+import Data.List              (intercalate)
+import Paths_sharpen          (version)
+import Data.Version           (showVersion)
 
 data RunOrInfo = Info String
                | Run Config
@@ -45,7 +46,7 @@ extractConfig c args =
 
     ["--help"]    -> Right $ Info usageString
 
-    ["--version"] -> Right $ Info "version 0.1.0.0"
+    ["--version"] -> Right $ Info (showVersion version)
 
     []    -> Right $ Run c
 
